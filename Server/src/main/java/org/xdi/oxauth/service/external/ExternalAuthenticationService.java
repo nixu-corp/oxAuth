@@ -6,7 +6,6 @@
 
 package org.xdi.oxauth.service.external;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,102 +15,74 @@ import java.util.Map.Entry;
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
-import org.jboss.seam.log.Log;
 import org.xdi.model.AuthenticationScriptUsageType;
 import org.xdi.model.SimpleCustomProperty;
 import org.xdi.model.custom.script.CustomScriptType;
 import org.xdi.model.custom.script.conf.CustomScriptConfiguration;
 import org.xdi.model.custom.script.model.auth.AuthenticationCustomScript;
 import org.xdi.model.custom.script.type.auth.CustomAuthenticatorType;
-import org.xdi.oxauth.service.custom.ExtendedCustomScriptManager;
-import org.xdi.service.custom.script.CustomScriptManager;
+import org.xdi.service.custom.script.ExternalScriptService;
 import org.xdi.util.StringHelper;
 
 /**
  * Provides factory methods needed to create external authenticator
  *
- * @author Yuriy Movchan Date: 08.21.2012
+ * @author Yuriy Movchan Date: 21/08/2012
  */
 @Scope(ScopeType.APPLICATION)
 @Name("externalAuthenticationService")
 @AutoCreate
 @Startup
-public class ExternalAuthenticationService implements Serializable {
+public class ExternalAuthenticationService extends ExternalScriptService {
 
-	private static final long serialVersionUID = -1225880597520443390L;
+	private static final long serialVersionUID = 7339887464253044927L;
 
 	public final static String ACR_METHOD_PREFIX = "https://schema.gluu.org/openid/acr/method/";
 
-//	private transient CustomScriptConfiguration defaultExternalAuthenticator;
-
-	private Map<String, CustomScriptConfiguration> customScriptConfigurations;
-	private Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> customScriptConfigurationsByUsageType;
+	private Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> customScriptConfigurationsMapByUsageType;
 	private Map<AuthenticationScriptUsageType, CustomScriptConfiguration> defaultExternalAuthenticators;
 
-	@Logger
-	private Log log;
-	
-	@In
-	private ExtendedCustomScriptManager extendedCustomScriptManager;
+	public ExternalAuthenticationService() {
+		super(CustomScriptType.CUSTOM_AUTHENTICATION);
+	}
 
-	@Observer(CustomScriptManager.MODIFIED_EVENT_TYPE)
-	public void reload() {
-		// Get actual list of external authenticator configurations
-		List<CustomScriptConfiguration> customScriptConfigurations = extendedCustomScriptManager.getCustomScriptConfigurationsByScriptType(CustomScriptType.CUSTOM_AUTHENTICATION);
-
-		// Store updated external authenticator configurations
-		this.customScriptConfigurations = reloadExternalConfigurations(customScriptConfigurations);
-
+	@Override
+	protected void reloadExternal() {
 		// Group external authenticator configurations by usage type
-		this.customScriptConfigurationsByUsageType = groupCustomScriptConfigurationsByUsageType(this.customScriptConfigurations);
+		this.customScriptConfigurationsMapByUsageType = groupCustomScriptConfigurationsMapByUsageType(this.customScriptConfigurationsMap);
 
 		// Determine default authenticator for every usage type
-		this.defaultExternalAuthenticators = determineDefaultCustomScriptConfigurations(this.customScriptConfigurations);
+		this.defaultExternalAuthenticators = determineDefaultCustomScriptConfigurationsMap(this.customScriptConfigurationsMap);
 	}
 
-	private Map<String, CustomScriptConfiguration> reloadExternalConfigurations(List<CustomScriptConfiguration> customScriptConfigurations) {
-		Map<String, CustomScriptConfiguration> reloadedExternalConfigurations = new HashMap<String, CustomScriptConfiguration>(customScriptConfigurations.size());
-		
-		// Convert CustomScript to old model
-		for (CustomScriptConfiguration customScriptConfiguration : customScriptConfigurations) {
-			reloadedExternalConfigurations.put(StringHelper.toLowerCase(customScriptConfiguration.getName()), customScriptConfiguration);
-		}
-
-		return reloadedExternalConfigurations;
-	}
-
-
-	public Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> groupCustomScriptConfigurationsByUsageType(Map<String,  CustomScriptConfiguration> customScriptConfigurations) {
-		Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> newCustomScriptConfigurationsByUsageType = new HashMap<AuthenticationScriptUsageType, List<CustomScriptConfiguration>>();
+	public Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> groupCustomScriptConfigurationsMapByUsageType(Map<String,  CustomScriptConfiguration> customScriptConfigurationsMap) {
+		Map<AuthenticationScriptUsageType, List<CustomScriptConfiguration>> newCustomScriptConfigurationsMapByUsageType = new HashMap<AuthenticationScriptUsageType, List<CustomScriptConfiguration>>();
 		
 		for (AuthenticationScriptUsageType usageType : AuthenticationScriptUsageType.values()) {
-			List<CustomScriptConfiguration> currCustomScriptConfigurationsByUsageType = new ArrayList<CustomScriptConfiguration>();
+			List<CustomScriptConfiguration> currCustomScriptConfigurationsMapByUsageType = new ArrayList<CustomScriptConfiguration>();
 
-			for (CustomScriptConfiguration customScriptConfiguration : customScriptConfigurations.values()) {
+			for (CustomScriptConfiguration customScriptConfiguration : customScriptConfigurationsMap.values()) {
 				if (!isValidateUsageType(usageType, customScriptConfiguration)) {
 					continue;
 				}
 				
-				currCustomScriptConfigurationsByUsageType.add(customScriptConfiguration);
+				currCustomScriptConfigurationsMapByUsageType.add(customScriptConfiguration);
 			}
-			newCustomScriptConfigurationsByUsageType.put(usageType, currCustomScriptConfigurationsByUsageType);
+			newCustomScriptConfigurationsMapByUsageType.put(usageType, currCustomScriptConfigurationsMapByUsageType);
 		}
 		
-		return newCustomScriptConfigurationsByUsageType;
+		return newCustomScriptConfigurationsMapByUsageType;
 	}
 
-	public Map<AuthenticationScriptUsageType, CustomScriptConfiguration> determineDefaultCustomScriptConfigurations(Map<String,  CustomScriptConfiguration> customScriptConfigurations) {
-		Map<AuthenticationScriptUsageType, CustomScriptConfiguration> newDefaultCustomScriptConfigurations = new HashMap<AuthenticationScriptUsageType, CustomScriptConfiguration>();
+	public Map<AuthenticationScriptUsageType, CustomScriptConfiguration> determineDefaultCustomScriptConfigurationsMap(Map<String,  CustomScriptConfiguration> customScriptConfigurationsMap) {
+		Map<AuthenticationScriptUsageType, CustomScriptConfiguration> newDefaultCustomScriptConfigurationsMap = new HashMap<AuthenticationScriptUsageType, CustomScriptConfiguration>();
 		
 		for (AuthenticationScriptUsageType usageType : AuthenticationScriptUsageType.values()) {
 			CustomScriptConfiguration defaultExternalAuthenticator = null;
-			for (CustomScriptConfiguration customScriptConfiguration : customScriptConfigurationsByUsageType.get(usageType)) {
+			for (CustomScriptConfiguration customScriptConfiguration : customScriptConfigurationsMapByUsageType.get(usageType)) {
 				// Determine default authenticator
 				if ((defaultExternalAuthenticator == null) ||
 						(defaultExternalAuthenticator.getLevel() >= customScriptConfiguration.getLevel())) {
@@ -119,10 +90,10 @@ public class ExternalAuthenticationService implements Serializable {
 				}
 			}
 			
-			newDefaultCustomScriptConfigurations.put(usageType, defaultExternalAuthenticator);
+			newDefaultCustomScriptConfigurationsMap.put(usageType, defaultExternalAuthenticator);
 		}
 		
-		return newDefaultCustomScriptConfigurations;
+		return newDefaultCustomScriptConfigurationsMap;
 	}
 
 	public boolean executeExternalAuthenticatorIsValidAuthenticationMethod(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
@@ -247,12 +218,12 @@ public class ExternalAuthenticationService implements Serializable {
 	}
 
 	public boolean isEnabled(AuthenticationScriptUsageType usageType) {
-		return this.customScriptConfigurationsByUsageType.get(usageType).size() > 0;
+		return this.customScriptConfigurationsMapByUsageType.get(usageType).size() > 0;
 	}
 
 	public CustomScriptConfiguration getExternalAuthenticatorByAuthLevel(AuthenticationScriptUsageType usageType, int authLevel) {
 		CustomScriptConfiguration resultDefaultExternalAuthenticator = null;
-		for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsByUsageType.get(usageType)) {
+		for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsMapByUsageType.get(usageType)) {
 			// Determine authenticator
 			if (customScriptConfiguration.getLevel() != authLevel) {
 				continue;
@@ -289,7 +260,7 @@ public class ExternalAuthenticationService implements Serializable {
 		List<String> authModes = getAuthModesByAcrValues(acrValues);
 		if (authModes.size() > 0) {
 			for (String authMode : authModes) {
-				for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsByUsageType.get(usageType)) {
+				for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsMapByUsageType.get(usageType)) {
 					if (StringHelper.equalsIgnoreCase(authMode, customScriptConfiguration.getName())) {
 						return customScriptConfiguration;
 					}
@@ -306,7 +277,7 @@ public class ExternalAuthenticationService implements Serializable {
 		for (String acrValue : acrValues) {
 			if (StringHelper.isNotEmpty(acrValue) && StringHelper.toLowerCase(acrValue).startsWith(ACR_METHOD_PREFIX)) {
 				String authMode = acrValue.substring(ACR_METHOD_PREFIX.length());
-				if (customScriptConfigurations.containsKey(StringHelper.toLowerCase(authMode))) {
+				if (customScriptConfigurationsMap.containsKey(StringHelper.toLowerCase(authMode))) {
 					authModes.add(authMode);
 				}
 			}
@@ -350,7 +321,7 @@ public class ExternalAuthenticationService implements Serializable {
 	}
 
 	public CustomScriptConfiguration getCustomScriptConfiguration(AuthenticationScriptUsageType usageType, String name) {
-		for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsByUsageType.get(usageType)) {
+		for (CustomScriptConfiguration customScriptConfiguration : this.customScriptConfigurationsMapByUsageType.get(usageType)) {
 			if (StringHelper.equalsIgnoreCase(name, customScriptConfiguration.getName())) {
 				return customScriptConfiguration;
 			}
@@ -360,7 +331,7 @@ public class ExternalAuthenticationService implements Serializable {
 	}
 
 	public CustomScriptConfiguration getCustomScriptConfiguration(String name) {
-		for (Entry<String, CustomScriptConfiguration> customScriptConfigurationEntry : this.customScriptConfigurations.entrySet()) {
+		for (Entry<String, CustomScriptConfiguration> customScriptConfigurationEntry : this.customScriptConfigurationsMap.entrySet()) {
 			if (StringHelper.equalsIgnoreCase(name, customScriptConfigurationEntry.getKey())) {
 				return customScriptConfigurationEntry.getValue();
 			}
@@ -369,14 +340,14 @@ public class ExternalAuthenticationService implements Serializable {
 		return null;
 	}
 
-	public List<CustomScriptConfiguration> getCustomScriptConfigurations() {
-		return new ArrayList<CustomScriptConfiguration>(this.customScriptConfigurations.values());
+	public List<CustomScriptConfiguration> getcustomScriptConfigurationsMap() {
+		return new ArrayList<CustomScriptConfiguration>(this.customScriptConfigurationsMap.values());
 	}
 
 	public  List<String> getAcrValuesList() {
 		List<String> acrValues = new ArrayList<String>();
 
-		for (Entry<String, CustomScriptConfiguration> customScriptConfigurationEntry : this.customScriptConfigurations.entrySet()) {
+		for (Entry<String, CustomScriptConfiguration> customScriptConfigurationEntry : this.customScriptConfigurationsMap.entrySet()) {
 			String acrValue = ACR_METHOD_PREFIX + customScriptConfigurationEntry.getKey();
 			acrValues.add(acrValue);
 		}
