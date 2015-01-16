@@ -12,22 +12,24 @@ import org.xdi.oxauth.model.crypto.Key;
 import org.xdi.oxauth.model.crypto.KeyFactory;
 import org.xdi.oxauth.model.crypto.signature.*;
 
+import java.util.UUID;
+
 /**
  * @author Javier Rojas Blum
- * @version 0.9, 09/23/2014
+ * @version 0.9 January 14, 2015
  */
 public class KeyGenerator {
 
     public static void main(String[] args) throws Exception {
         JSONArray keys = new JSONArray();
 
-        keys.put(generateRS256Keys());
-        keys.put(generateRS384Keys());
-        keys.put(generateRS512Keys());
+        keys.put(generateRS256Keys(null));
+        keys.put(generateRS384Keys(null));
+        keys.put(generateRS512Keys(null));
 
-        keys.put(generateES256Keys());
-        keys.put(generateES384Keys());
-        keys.put(generateES512Keys());
+        keys.put(generateES256Keys(null));
+        keys.put(generateES384Keys(null));
+        keys.put(generateES512Keys(null));
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("keys", keys);
@@ -35,7 +37,7 @@ public class KeyGenerator {
         System.out.println(jsonObject.toString(4).replace("\\/", "/"));
     }
 
-    public static JSONObject generateRS256Keys() throws Exception {
+    public static JSONObject generateRS256Keys(Long expirationTime) throws Exception {
         KeyFactory<RSAPrivateKey, RSAPublicKey> keyFactory = new RSAKeyFactory(
                 SignatureAlgorithm.RS256,
                 "CN=Test CA Certificate");
@@ -44,14 +46,15 @@ public class KeyGenerator {
 
         key.setKeyType("RSA");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("RS256");
-        key.setKeyId("1");
+        key.setAlgorithm(SignatureAlgorithm.RS256.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve(JSONObject.NULL);
 
         return key.toJSONObject();
     }
 
-    public static JSONObject generateRS384Keys() throws Exception {
+    public static JSONObject generateRS384Keys(Long expirationTime) throws Exception {
         KeyFactory<RSAPrivateKey, RSAPublicKey> keyFactory = new RSAKeyFactory(
                 SignatureAlgorithm.RS384,
                 "CN=Test CA Certificate");
@@ -60,14 +63,15 @@ public class KeyGenerator {
 
         key.setKeyType("RSA");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("RS384");
-        key.setKeyId("2");
+        key.setAlgorithm(SignatureAlgorithm.RS384.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve(JSONObject.NULL);
 
         return key.toJSONObject();
     }
 
-    public static JSONObject generateRS512Keys() throws Exception {
+    public static JSONObject generateRS512Keys(Long expirationTime) throws Exception {
         KeyFactory<RSAPrivateKey, RSAPublicKey> keyFactory = new RSAKeyFactory(
                 SignatureAlgorithm.RS512,
                 "CN=Test CA Certificate");
@@ -76,14 +80,15 @@ public class KeyGenerator {
 
         key.setKeyType("RSA");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("RS512");
-        key.setKeyId("3");
+        key.setAlgorithm(SignatureAlgorithm.RS512.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve(JSONObject.NULL);
 
         return key.toJSONObject();
     }
 
-    public static JSONObject generateES256Keys() throws Exception {
+    public static JSONObject generateES256Keys(Long expirationTime) throws Exception {
         KeyFactory<ECDSAPrivateKey, ECDSAPublicKey> keyFactory = new ECDSAKeyFactory(
                 SignatureAlgorithm.ES256,
                 "CN=Test CA Certificate");
@@ -92,14 +97,15 @@ public class KeyGenerator {
 
         key.setKeyType("EC");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("EC");
-        key.setKeyId("4");
+        key.setAlgorithm(SignatureAlgorithm.ES256.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve("P-256");
 
         return key.toJSONObject();
     }
 
-    public static JSONObject generateES384Keys() throws Exception {
+    public static JSONObject generateES384Keys(Long expirationTime) throws Exception {
         KeyFactory<ECDSAPrivateKey, ECDSAPublicKey> keyFactory = new ECDSAKeyFactory(
                 SignatureAlgorithm.ES384,
                 "CN=Test CA Certificate");
@@ -108,14 +114,15 @@ public class KeyGenerator {
 
         key.setKeyType("EC");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("EC");
-        key.setKeyId("5");
+        key.setAlgorithm(SignatureAlgorithm.ES384.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve("P-384");
 
         return key.toJSONObject();
     }
 
-    public static JSONObject generateES512Keys() throws Exception{
+    public static JSONObject generateES512Keys(Long expirationTime) throws Exception{
         KeyFactory<ECDSAPrivateKey, ECDSAPublicKey> keyFactory = new ECDSAKeyFactory(
                 SignatureAlgorithm.ES512,
                 "CN=Test CA Certificate");
@@ -124,8 +131,9 @@ public class KeyGenerator {
 
         key.setKeyType("EC");
         key.setUse("SIGNATURE");
-        key.setAlgorithm("EC");
-        key.setKeyId("6");
+        key.setAlgorithm(SignatureAlgorithm.ES512.getName());
+        key.setKeyId(UUID.randomUUID().toString());
+        key.setExpirationTime(expirationTime);
         key.setCurve("P-521");
 
         return key.toJSONObject();

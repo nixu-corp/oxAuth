@@ -96,7 +96,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return newDefaultCustomScriptConfigurationsMap;
 	}
 
-	public boolean executeExternalAuthenticatorIsValidAuthenticationMethod(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
+	public boolean executeExternalIsValidAuthenticationMethod(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
 		try {
 			log.debug("Executing python 'isValidAuthenticationMethod' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -109,7 +109,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return false;
 	}
 
-	public String executeExternalAuthenticatorGetAlternativeAuthenticationMethod(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
+	public String executeExternalGetAlternativeAuthenticationMethod(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
 		try {
 			log.debug("Executing python 'getAlternativeAuthenticationMethod' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -122,7 +122,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return null;
 	}
 
-	public int executeExternalAuthenticatorGetCountAuthenticationSteps(CustomScriptConfiguration customScriptConfiguration) {
+	public int executeExternalGetCountAuthenticationSteps(CustomScriptConfiguration customScriptConfiguration) {
 		try {
 			log.debug("Executing python 'getCountAuthenticationSteps' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -135,7 +135,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return -1;
 	}
 
-	public boolean executeExternalAuthenticatorAuthenticate(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters, int step) {
+	public boolean executeExternalAuthenticate(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters, int step) {
 		try {
 			log.debug("Executing python 'authenticate' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -148,25 +148,19 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return false;
 	}
 
-	public boolean executeExternalAuthenticatorLogout(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters) {
-    	// Validate API version
-        int apiVersion = executeExternalAuthenticatorGetApiVersion(customScriptConfiguration);
-        if (apiVersion > 2) {
-			try {
-				log.debug("Executing python 'logout' authenticator method");
-				CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
-				Map<String, SimpleCustomProperty> configurationAttributes = customScriptConfiguration.getConfigurationAttributes();
-				return externalAuthenticator.logout(configurationAttributes, requestParameters);
-			} catch (Exception ex) {
-				log.error(ex.getMessage(), ex);
-			}
-			return false;
-        }
-
-        return true;
+	public boolean executeExternalLogout(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters) {
+		try {
+			log.debug("Executing python 'logout' authenticator method");
+			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
+			Map<String, SimpleCustomProperty> configurationAttributes = customScriptConfiguration.getConfigurationAttributes();
+			return externalAuthenticator.logout(configurationAttributes, requestParameters);
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
+		return false;
 	}
 
-	public boolean executeExternalAuthenticatorPrepareForStep(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters, int step) {
+	public boolean executeExternalPrepareForStep(CustomScriptConfiguration customScriptConfiguration, Map<String, String[]> requestParameters, int step) {
 		try {
 			log.debug("Executing python 'prepareForStep' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -179,7 +173,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return false;
 	}
 
-	public List<String> executeExternalAuthenticatorGetExtraParametersForStep(CustomScriptConfiguration customScriptConfiguration, int step) {
+	public List<String> executeExternalGetExtraParametersForStep(CustomScriptConfiguration customScriptConfiguration, int step) {
 		try {
 			log.debug("Executing python 'getPageForStep' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -192,7 +186,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return null;
 	}
 
-	public String executeExternalAuthenticatorGetPageForStep(CustomScriptConfiguration customScriptConfiguration, int step) {
+	public String executeExternalGetPageForStep(CustomScriptConfiguration customScriptConfiguration, int step) {
 		try {
 			log.debug("Executing python 'getPageForStep' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -205,7 +199,7 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 		return null;
 	}
 
-	public int executeExternalAuthenticatorGetApiVersion(CustomScriptConfiguration customScriptConfiguration) {
+	public int executeExternalGetApiVersion(CustomScriptConfiguration customScriptConfiguration) {
 		try {
 			log.debug("Executing python 'getApiVersion' authenticator method");
 			CustomAuthenticatorType externalAuthenticator = (CustomAuthenticatorType) customScriptConfiguration.getExternalType();
@@ -287,34 +281,30 @@ public class ExternalAuthenticationService extends ExternalScriptService {
 	}
 
 	public CustomScriptConfiguration determineExternalAuthenticatorForWorkflow(AuthenticationScriptUsageType usageType, CustomScriptConfiguration customScriptConfiguration) {
-    	// Validate API version
-        int apiVersion = executeExternalAuthenticatorGetApiVersion(customScriptConfiguration);
-        if (apiVersion > 2) {
-        	String authMode = customScriptConfiguration.getName();
-        	log.debug("Validating auth_mode: '{0}'", authMode);
+    	String authMode = customScriptConfiguration.getName();
+    	log.debug("Validating auth_mode: '{0}'", authMode);
 
-        	boolean isValidAuthenticationMethod = executeExternalAuthenticatorIsValidAuthenticationMethod(usageType, customScriptConfiguration);
-            if (!isValidAuthenticationMethod) {
-            	log.warn("Current auth_mode: '{0}' isn't valid", authMode);
+    	boolean isValidAuthenticationMethod = executeExternalIsValidAuthenticationMethod(usageType, customScriptConfiguration);
+        if (!isValidAuthenticationMethod) {
+        	log.warn("Current auth_mode: '{0}' isn't valid", authMode);
 
-            	String alternativeAuthenticationMethod = executeExternalAuthenticatorGetAlternativeAuthenticationMethod(usageType, customScriptConfiguration);
-                if (StringHelper.isEmpty(alternativeAuthenticationMethod)) {
-                	log.error("Failed to determine alternative authentication mode for auth_mode: '{0}'", authMode);
+        	String alternativeAuthenticationMethod = executeExternalGetAlternativeAuthenticationMethod(usageType, customScriptConfiguration);
+            if (StringHelper.isEmpty(alternativeAuthenticationMethod)) {
+            	log.error("Failed to determine alternative authentication mode for auth_mode: '{0}'", authMode);
+                return null;
+            } else {
+            	CustomScriptConfiguration alternativeCustomScriptConfiguration = getCustomScriptConfiguration(AuthenticationScriptUsageType.INTERACTIVE, alternativeAuthenticationMethod);
+                if (alternativeCustomScriptConfiguration == null) {
+                    log.error("Failed to get alternative CustomScriptConfiguration '{0}' for auth_mode: '{1}'", alternativeAuthenticationMethod, authMode);
                     return null;
                 } else {
-                	CustomScriptConfiguration alternativeCustomScriptConfiguration = getCustomScriptConfiguration(AuthenticationScriptUsageType.INTERACTIVE, alternativeAuthenticationMethod);
-                    if (alternativeCustomScriptConfiguration == null) {
-                        log.error("Failed to get alternative CustomScriptConfiguration '{0}' for auth_mode: '{1}'", alternativeAuthenticationMethod, authMode);
-                        return null;
-                    } else {
-                        return alternativeCustomScriptConfiguration;
-                    }
+                    return alternativeCustomScriptConfiguration;
                 }
             }
         }
         
         return customScriptConfiguration;
-	}
+    }
 
 	public CustomScriptConfiguration getDefaultExternalAuthenticator(AuthenticationScriptUsageType usageType) {
 		return this.defaultExternalAuthenticators.get(usageType);
