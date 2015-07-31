@@ -6,9 +6,18 @@
 
 package org.xdi.oxauth.model.token;
 
+import java.io.UnsupportedEncodingException;
+import java.security.SignatureException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.xdi.oxauth.model.common.AccessToken;
 import org.xdi.oxauth.model.common.AuthorizationCode;
+import org.xdi.oxauth.model.common.AuthorizationGrantType;
 import org.xdi.oxauth.model.common.IAuthorizationGrant;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
 import org.xdi.oxauth.model.crypto.PublicKey;
@@ -18,6 +27,7 @@ import org.xdi.oxauth.model.crypto.signature.ECDSAPrivateKey;
 import org.xdi.oxauth.model.crypto.signature.RSAPrivateKey;
 import org.xdi.oxauth.model.crypto.signature.RSAPublicKey;
 import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
+import org.xdi.oxauth.model.exception.InvalidClaimException;
 import org.xdi.oxauth.model.exception.InvalidJweException;
 import org.xdi.oxauth.model.exception.InvalidJwtException;
 import org.xdi.oxauth.model.jwe.Jwe;
@@ -35,10 +45,6 @@ import org.xdi.oxauth.model.jwt.JwtType;
 import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.oxauth.model.util.Util;
 import org.xdi.util.security.StringEncrypter;
-
-import java.io.UnsupportedEncodingException;
-import java.security.SignatureException;
-import java.util.*;
 
 /**
  * JSON Web Token (JWT) is a compact token format intended for space constrained
@@ -89,7 +95,32 @@ public class IdTokenFactory {
         jwt.getClaims().setExpirationTime(expiration);
         jwt.getClaims().setIssuedAt(issuedAt);
 
-        jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+        if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+        	
+        	jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getClientId());
+        	
+        } else if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+    		
+    		Object attributeValue = null;
+    		
+			try {
+				
+				attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+			
+			} catch (InvalidClaimException e) {
+				// Ignore exception
+			}
+			
+    		if (attributeValue != null && attributeValue instanceof String) {
+    			jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, attributeValue.toString());
+    		}
+    		
+    	} else {
+    		
+    		jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    		
+    	}
+
 
         // TODO: acr
         //if (authenticationContextClassReference != null) {
@@ -181,7 +212,31 @@ public class IdTokenFactory {
         jwe.getClaims().setExpirationTime(expiration);
         jwe.getClaims().setIssuedAt(issuedAt);
 
-        jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+        if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+        
+        	jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getClientId());
+        	
+        } else if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+    		
+    		Object attributeValue = null;
+    		
+			try {
+				
+				attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+			
+			} catch (InvalidClaimException e) {
+				// Ignore exception
+			}
+			
+    		if (attributeValue != null && attributeValue instanceof String) {
+    			jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, attributeValue.toString());
+    		}
+    		
+    	} else {
+    		
+    		jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    		
+    	}
 
         // TODO: acr
         //if (authenticationContextClassReference != null) {

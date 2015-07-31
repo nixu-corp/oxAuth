@@ -254,7 +254,23 @@ public class UserInfoRestWebServiceImpl implements UserInfoRestWebService {
             }
         }
         //The sub (subject) Claim MUST always be returned in the UserInfo Response.
-        jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    	if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+    		
+    		Object attributeValue = null;
+    		
+			try {
+				attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+			} catch (InvalidClaimException e) {
+				// Ignore exception
+			}
+			
+    		if (attributeValue != null && attributeValue instanceof String) {
+    			jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, attributeValue.toString());
+    		}
+    		
+    	} else {
+    		jwt.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    	}
 
         // Signature
         JSONWebKey jwk = null;
@@ -356,7 +372,23 @@ public class UserInfoRestWebServiceImpl implements UserInfoRestWebService {
             }
         }
         //The sub (subject) Claim MUST always be returned in the UserInfo Response.
-        jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    	if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+    		
+    		Object attributeValue = null;
+    		
+			try {
+				attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+			} catch (InvalidClaimException e) {
+				// Ignore exception
+			}
+			
+    		if (attributeValue != null && attributeValue instanceof String) {
+    			jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, attributeValue.toString());
+    		}
+    		
+    	} else {
+    		jwe.getClaims().setClaim(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+    	}
 
         // Encryption
         if (keyEncryptionAlgorithm == KeyEncryptionAlgorithm.RSA_OAEP
@@ -435,7 +467,23 @@ public class UserInfoRestWebServiceImpl implements UserInfoRestWebService {
             }
 
             //The sub (subject) Claim MUST always be returned in the UserInfo Response.
-            jsonObj.put(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+        	if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+        		
+        		Object attributeValue = null;
+        		
+    			try {
+    				attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+    			} catch (InvalidClaimException e) {
+    				// Ignore exception
+    			}
+    			
+        		if (attributeValue != null && attributeValue instanceof String) {
+        			jsonObj.put(JwtClaimName.SUBJECT_IDENTIFIER, attributeValue.toString());
+        		}
+        		
+        	} else {
+        		jsonObj.put(JwtClaimName.SUBJECT_IDENTIFIER, authorizationGrant.getClient().getSubjectIdentifier());
+        	}
         } catch (JSONException e) {
             log.error(e.getMessage(), e);
         } catch (Exception e) {

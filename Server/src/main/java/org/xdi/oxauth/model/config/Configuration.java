@@ -121,6 +121,8 @@ public class Configuration {
     private String jsLocation;
     private String imgLocation;
 
+    private String subjectClaim;
+
     @XmlElement(name = "uma-keep-client-during-resource-set-registration")
     public Boolean getUmaKeepClientDuringResourceSetRegistration() {
         return umaKeepClientDuringResourceSetRegistration;
@@ -1068,4 +1070,13 @@ public class Configuration {
         this.imgLocation = imgLocation;
     }
 
+    @XmlElement(name = "subjectClaim")
+	public String getSubjectClaim() {
+		return subjectClaim;
+	}
+
+	public void setSubjectClaim(String subjectClaim) {
+		this.subjectClaim = subjectClaim;
+	}
+    
 }

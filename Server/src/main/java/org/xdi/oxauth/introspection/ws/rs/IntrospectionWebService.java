@@ -25,6 +25,7 @@ import org.xdi.oxauth.model.authorize.AuthorizeErrorResponseType;
 import org.xdi.oxauth.model.common.AbstractToken;
 import org.xdi.oxauth.model.common.AuthorizationGrant;
 import org.xdi.oxauth.model.common.AuthorizationGrantList;
+import org.xdi.oxauth.model.common.AuthorizationGrantType;
 import org.xdi.oxauth.model.common.IntrospectionResponse;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
 import org.xdi.oxauth.model.error.ErrorResponseFactory;
@@ -108,6 +109,23 @@ public class IntrospectionWebService {
                                 	response.setClientId(authorizationGrant.getClientId());
                                 	response.setUsername(authorizationGrant.getUserId());
                                 	response.setIssuer(ConfigurationFactory.getConfiguration().getIssuer());
+                                	
+                                	if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+                                		
+                                		response.setSubject(authorizationGrant.getClientId());
+                                		
+                                	} else {
+                                		
+                                		if (ConfigurationFactory.getConfiguration().getSubjectClaim() != null && authorizationGrant.getUser() != null) {
+                                		
+                                			Object attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.getConfiguration().getSubjectClaim(), true);
+                                			if (attributeValue != null && attributeValue instanceof String) {
+                                				response.setSubject(attributeValue.toString());
+                                			}
+                                			
+                                		}
+                                		
+                                	}
                                 }
                                 
                             }
