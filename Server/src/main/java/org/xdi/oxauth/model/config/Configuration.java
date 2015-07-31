@@ -122,6 +122,11 @@ public class Configuration {
     private String imgLocation;
 
     private String subjectClaim;
+    private String tokenType;
+    private String tokenSigningType;
+    private String tokenSigningKey;
+    
+    private List<String> jwtAccessTokenClaimsSupported;
 
     @XmlElement(name = "uma-keep-client-during-resource-set-registration")
     public Boolean getUmaKeepClientDuringResourceSetRegistration() {
@@ -1079,4 +1084,41 @@ public class Configuration {
 		this.subjectClaim = subjectClaim;
 	}
     
+    @XmlElementWrapper(name = "jwt-access-token-claims-supported")
+    @XmlElement(name = "jwt-access-token-claim")
+	public List<String> getJwtAccessTokenClaimsSupported() {
+		return jwtAccessTokenClaimsSupported;
+	}
+
+	public void setJwtAccessTokenClaimsSupported(
+			List<String> jwtAccessTokenClaimsSupported) {
+		this.jwtAccessTokenClaimsSupported = jwtAccessTokenClaimsSupported;
+	}
+	
+	@XmlElement(name = "tokenType")
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
+	}
+
+	@XmlElement(name = "tokenSigningType")
+	public String getTokenSigningType() {
+		return tokenSigningType;
+	}
+
+	public void setTokenSigningType(String tokenSigningType) {
+		this.tokenSigningType = tokenSigningType;
+	}
+
+	@XmlElement(name = "tokenSigningKey")
+	public String getTokenSigningKey() {
+		return tokenSigningKey;
+	}
+
+	public void setTokenSigningKey(String tokenSigningKey) {
+		this.tokenSigningKey = tokenSigningKey;
+	}
 }
