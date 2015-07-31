@@ -418,7 +418,8 @@ class PersonAuthentication(PersonAuthenticationType):
             print "Saml. Prepare for step 1"
 
             print "Saml. Prepare for step 1. Store current request parameters in session because Saml don't pass them via service URI"
-            authenticationService.storeRequestParametersInSession()
+            # authenticationService.storeRequestParametersInSession()
+            Contexts.getSessionContext().set("stored_request_parameters",authenticationService.getParametersMap(None))
             
             httpService = HttpService.instance();
             request = FacesContext.getCurrentInstance().getExternalContext().getRequest()
