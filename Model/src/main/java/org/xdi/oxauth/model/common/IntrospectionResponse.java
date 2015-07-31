@@ -31,7 +31,15 @@ public class IntrospectionResponse {
     private String authMode;
     @JsonProperty(value = "auth_level")
     private String authLevel;
-
+    private String scope;
+    @JsonProperty(value = "client_id")
+    private String clientId;
+    private String username;
+    @JsonProperty(value = "iss")
+    private String issuer;
+    @JsonProperty(value = "sub")
+    private String subject;
+    
     public IntrospectionResponse() {
     }
 
@@ -78,4 +86,45 @@ public class IntrospectionResponse {
     public void setIssuedAt(Date p_issuedAt) {
         issuedAt = p_issuedAt;
     }
+    
+	public String getScope() {
+		return scope;
+	}
+
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getIssuer() {
+		return issuer;
+	}
+
+	public void setIssuer(String issuer) {
+		this.issuer = issuer;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
 }
