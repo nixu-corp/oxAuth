@@ -117,14 +117,15 @@ public class TokenRestWebServiceImpl implements TokenRestWebService {
                     AuthorizationCodeGrant authorizationCodeGrant = authorizationGrantList.getAuthorizationCodeGrant(client.getClientId(), code);
 
                     if (authorizationCodeGrant != null) {
-                        AccessToken accToken = authorizationCodeGrant.createAccessToken();
-                        log.debug("Issuing access token: {0}", accToken.getCode());
-
-                        RefreshToken reToken = authorizationCodeGrant.createRefreshToken();
 
                         if (scope != null && !scope.isEmpty()) {
                             scope = authorizationCodeGrant.checkScopesPolicy(scope);
                         }
+
+                    	AccessToken accToken = authorizationCodeGrant.createAccessToken();
+                        log.debug("Issuing access token: {0}", accToken.getCode());
+
+                        RefreshToken reToken = authorizationCodeGrant.createRefreshToken();
 
                         IdToken idToken = null;
                         if (authorizationCodeGrant.getScopes().contains("openid")) {
@@ -159,12 +160,13 @@ public class TokenRestWebServiceImpl implements TokenRestWebService {
                     AuthorizationGrant authorizationGrant = authorizationGrantList.getAuthorizationGrantByRefreshToken(client.getClientId(), refreshToken);
 
                     if (authorizationGrant != null) {
-                        AccessToken accToken = authorizationGrant.createAccessToken();
-                        RefreshToken reToken = authorizationGrant.createRefreshToken();
 
                         if (scope != null && !scope.isEmpty()) {
                             scope = authorizationGrant.checkScopesPolicy(scope);
                         }
+
+                    	AccessToken accToken = authorizationGrant.createAccessToken();
+                        RefreshToken reToken = authorizationGrant.createRefreshToken();
 
                         IdToken idToken = null;
                         if (authorizationGrant.getScopes().contains("openid")) {
@@ -185,11 +187,11 @@ public class TokenRestWebServiceImpl implements TokenRestWebService {
                 } else if (gt == GrantType.CLIENT_CREDENTIALS) {
                     ClientCredentialsGrant clientCredentialsGrant = authorizationGrantList.createClientCredentialsGrant(new User(), client); // TODO: fix the user arg
 
-                    AccessToken accessToken = clientCredentialsGrant.createAccessToken();
-
                     if (scope != null && !scope.isEmpty()) {
                         scope = clientCredentialsGrant.checkScopesPolicy(scope);
                     }
+
+                    AccessToken accessToken = clientCredentialsGrant.createAccessToken();
 
                     IdToken idToken = null;
                     if (clientCredentialsGrant.getScopes().contains("openid")) {
@@ -222,12 +224,13 @@ public class TokenRestWebServiceImpl implements TokenRestWebService {
 
                     if (user != null) {
                         ResourceOwnerPasswordCredentialsGrant resourceOwnerPasswordCredentialsGrant = authorizationGrantList.createResourceOwnerPasswordCredentialsGrant(user, client);
-                        AccessToken accessToken = resourceOwnerPasswordCredentialsGrant.createAccessToken();
-                        RefreshToken reToken = resourceOwnerPasswordCredentialsGrant.createRefreshToken();
 
                         if (scope != null && !scope.isEmpty()) {
                             scope = resourceOwnerPasswordCredentialsGrant.checkScopesPolicy(scope);
                         }
+
+                        AccessToken accessToken = resourceOwnerPasswordCredentialsGrant.createAccessToken();
+                        RefreshToken reToken = resourceOwnerPasswordCredentialsGrant.createRefreshToken();
 
                         IdToken idToken = null;
                         if (resourceOwnerPasswordCredentialsGrant.getScopes().contains("openid")) {

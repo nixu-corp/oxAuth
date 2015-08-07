@@ -462,6 +462,9 @@ public class AuthorizeRestWebServiceImpl implements AuthorizeRestWebService {
                                                     sessionUser.getAuthenticationTime());
                                             authorizationGrant.setNonce(nonce);
                                             authorizationGrant.setJwtAuthorizationRequest(jwtAuthorizationRequest);
+                                            if (scope != null && !scope.isEmpty()) {
+                                            	scope = authorizationGrant.checkScopesPolicy(scope);
+                                            }
 
                                             // Store authentication level and mode
                                             authorizationGrant.setAuthLevel(authLevel);
