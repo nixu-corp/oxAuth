@@ -22,6 +22,7 @@ import org.xdi.oxauth.model.util.JwtUtil;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -61,9 +62,9 @@ public class FederationSigningTest extends BaseComponentTestAdapter {
     @Test
     public void test() throws InvalidJwtException, JSONException, SignatureException, IOException, IllegalBlockSizeException, NoSuchProviderException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, BadPaddingException {
         final String keyId = testKeyId();
-        final SignatureAlgorithm algorithm = SignatureAlgorithm.fromName(ConfigurationFactory.getConfiguration().getFederationSigningAlg());
+        final SignatureAlgorithm algorithm = SignatureAlgorithm.fromName(ConfigurationFactory.instance().getConfiguration().getFederationSigningAlg());
 
-        final JSONWebKey JSONWebKey = ConfigurationFactory.getWebKeys().getKey(keyId);
+        final JSONWebKey JSONWebKey = ConfigurationFactory.instance().getWebKeys().getKey(keyId);
 
         final RSAKeyFactory factory = RSAKeyFactory.valueOf(JSONWebKey);
 
@@ -88,19 +89,19 @@ public class FederationSigningTest extends BaseComponentTestAdapter {
     }
 
     public static String testKeyId() {
-        String keyId = ConfigurationFactory.getConfiguration().getFederationSigningKid();
+        String keyId = ConfigurationFactory.instance().getConfiguration().getFederationSigningKid();
 
-        if (ConfigurationFactory.getWebKeys().getKey(keyId) != null) {
+        if (ConfigurationFactory.instance().getWebKeys().getKey(keyId) != null) {
             return keyId;
         }
 
         keyId = "6898cff9-4f92-4b58-b37c-2a2b6779b0b3";
-        if (ConfigurationFactory.getWebKeys().getKey(keyId) != null) {
+        if (ConfigurationFactory.instance().getWebKeys().getKey(keyId) != null) {
             return keyId;
         }
 
-        if (!ConfigurationFactory.getWebKeys().getKeys().isEmpty()) {
-            return ConfigurationFactory.getWebKeys().getKeys().get(0).getKeyId();
+        if (!ConfigurationFactory.instance().getWebKeys().getKeys().isEmpty()) {
+            return ConfigurationFactory.instance().getWebKeys().getKeys().get(0).getKeyId();
         }
 
         throw new RuntimeException("Failed to identify key id for signing");

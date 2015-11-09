@@ -149,8 +149,11 @@ public class Client {
     @LdapAttribute(name = "oxAuthFederationMetadataURI")
     private String federationURI;
 
-    @LdapAttribute(name = "oxAuthSubjectIdentifier")
-    private String subjectIdentifier;
+    @LdapAttribute(name = "oxLastAccessTime")
+    private Date lastAccessTime;
+
+    @LdapAttribute(name = "oxLastLogonTime")
+    private Date lastLogonTime;
 
     @LdapAttributesList(name = "name", value = "values", sortByName = true)
     private List<CustomAttribute> customAttributes = new ArrayList<CustomAttribute>();
@@ -896,15 +899,23 @@ public class Client {
         federationURI = p_federationURI;
     }
 
-    public String getSubjectIdentifier() {
-        return subjectIdentifier;
-    }
+    public Date getLastAccessTime() {
+		return lastAccessTime;
+	}
 
-    public void setSubjectIdentifier(String subjectIdentifier) {
-        this.subjectIdentifier = subjectIdentifier;
-    }
+	public void setLastAccessTime(Date lastAccessTime) {
+		this.lastAccessTime = lastAccessTime;
+	}
 
-    public List<CustomAttribute> getCustomAttributes() {
+	public Date getLastLogonTime() {
+		return lastLogonTime;
+	}
+
+	public void setLastLogonTime(Date lastLogonTime) {
+		this.lastLogonTime = lastLogonTime;
+	}
+
+	public List<CustomAttribute> getCustomAttributes() {
         return customAttributes;
     }
 
@@ -927,7 +938,7 @@ public class Client {
     public static String buildClientDn(String p_clientId) {
         final StringBuilder dn = new StringBuilder();
         dn.append(String.format("inum=%s,", p_clientId));
-        dn.append(ConfigurationFactory.getBaseDn().getClients()); // ou=clients,o=@!1111,o=gluu
+        dn.append(ConfigurationFactory.instance().getBaseDn().getClients()); // ou=clients,o=@!1111,o=gluu
         return dn.toString();
     }
 

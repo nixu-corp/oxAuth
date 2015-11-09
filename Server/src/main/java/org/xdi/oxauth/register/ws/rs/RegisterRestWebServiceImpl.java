@@ -6,6 +6,60 @@
 
 package org.xdi.oxauth.register.ws.rs;
 
+import static org.xdi.oxauth.model.register.RegisterRequestParam.APPLICATION_TYPE;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.CLIENT_NAME;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.CLIENT_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.CONTACTS;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.DEFAULT_ACR_VALUES;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.DEFAULT_MAX_AGE;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.FEDERATION_METADATA_ID;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.FEDERATION_METADATA_URL;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.GRANT_TYPES;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.ID_TOKEN_ENCRYPTED_RESPONSE_ALG;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.ID_TOKEN_ENCRYPTED_RESPONSE_ENC;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.ID_TOKEN_SIGNED_RESPONSE_ALG;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.INITIATE_LOGIN_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.JWKS;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.JWKS_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.LOGO_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.POLICY_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.POST_LOGOUT_REDIRECT_URIS;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.REDIRECT_URIS;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.REQUEST_OBJECT_SIGNING_ALG;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.REQUEST_URIS;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.REQUIRE_AUTH_TIME;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.RESPONSE_TYPES;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.SECTOR_IDENTIFIER_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.SUBJECT_TYPE;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.TOKEN_ENDPOINT_AUTH_METHOD;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.TOS_URI;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.USERINFO_ENCRYPTED_RESPONSE_ALG;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.USERINFO_ENCRYPTED_RESPONSE_ENC;
+import static org.xdi.oxauth.model.register.RegisterRequestParam.USERINFO_SIGNED_RESPONSE_ALG;
+import static org.xdi.oxauth.model.register.RegisterResponseParam.CLIENT_ID_ISSUED_AT;
+import static org.xdi.oxauth.model.register.RegisterResponseParam.CLIENT_SECRET;
+import static org.xdi.oxauth.model.register.RegisterResponseParam.CLIENT_SECRET_EXPIRES_AT;
+import static org.xdi.oxauth.model.register.RegisterResponseParam.REGISTRATION_CLIENT_URI;
+import static org.xdi.oxauth.model.util.StringUtils.toList;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -15,11 +69,11 @@ import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.log.Log;
 import org.jboss.seam.log.Logging;
+import org.xdi.model.metric.MetricType;
 import org.xdi.oxauth.client.RegisterRequest;
 import org.xdi.oxauth.model.common.CustomAttribute;
 import org.xdi.oxauth.model.common.ResponseType;
 import org.xdi.oxauth.model.common.Scope;
-import org.xdi.oxauth.model.common.SubjectType;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
 import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
 import org.xdi.oxauth.model.error.ErrorResponseFactory;
@@ -28,28 +82,15 @@ import org.xdi.oxauth.model.register.RegisterResponseParam;
 import org.xdi.oxauth.model.registration.Client;
 import org.xdi.oxauth.model.registration.RegisterParamsValidator;
 import org.xdi.oxauth.model.token.HandleTokenFactory;
-import org.xdi.oxauth.model.util.SubjectIdentifierGenerator;
 import org.xdi.oxauth.model.util.Util;
 import org.xdi.oxauth.service.ClientService;
 import org.xdi.oxauth.service.InumService;
+import org.xdi.oxauth.service.MetricService;
 import org.xdi.oxauth.service.ScopeService;
 import org.xdi.oxauth.service.external.ExternalDynamicClientRegistrationService;
 import org.xdi.oxauth.service.token.TokenService;
 import org.xdi.oxauth.util.ServerUtil;
 import org.xdi.util.security.StringEncrypter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import java.net.URI;
-import java.util.*;
-
-import static org.xdi.oxauth.model.register.RegisterRequestParam.*;
-import static org.xdi.oxauth.model.register.RegisterResponseParam.*;
-import static org.xdi.oxauth.model.util.StringUtils.toList;
 
 /**
  * Implementation for register REST web services.
@@ -76,24 +117,35 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
     private TokenService tokenService;
 
     @In
+    private MetricService metricService;
+
+    @In
     private ExternalDynamicClientRegistrationService externalDynamicClientRegistrationService;
 
     @Override
     public Response requestRegister(String requestParams, String authorization, HttpServletRequest httpRequest, SecurityContext securityContext) {
+        com.codahale.metrics.Timer.Context timerContext = metricService.getTimer(MetricType.DYNAMIC_CLIENT_REGISTRATION_RATE).time();
+        try {
+        	return registerClientImpl(requestParams, securityContext);
+        } finally {
+        	timerContext.stop();
+        }
+    }
 
-        Response.ResponseBuilder builder = Response.ok();
+	private Response registerClientImpl(String requestParams, SecurityContext securityContext) {
+		Response.ResponseBuilder builder = Response.ok();
 
         try {
             final RegisterRequest r = RegisterRequest.fromJson(requestParams);
 
             if (r.getIdTokenSignedResponseAlg() == null) {
-                r.setIdTokenSignedResponseAlg(SignatureAlgorithm.fromName(ConfigurationFactory.getConfiguration().getDefaultSignatureAlgorithm()));
+                r.setIdTokenSignedResponseAlg(SignatureAlgorithm.fromName(ConfigurationFactory.instance().getConfiguration().getDefaultSignatureAlgorithm()));
             }
 
             log.debug("Attempting to register client: applicationType = {0}, clientName = {1}, redirectUris = {2}, isSecure = {3}, sectorIdentifierUri = {4}",
                     r.getApplicationType(), r.getClientName(), r.getRedirectUris(), securityContext.isSecure(), r.getSectorIdentifierUri());
 
-            if (ConfigurationFactory.getConfiguration().getDynamicRegistrationEnabled()) {
+            if (ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationEnabled()) {
 
                 if (RegisterParamsValidator.validateParamsClientRegister(r.getApplicationType(), r.getRedirectUris(),
                         r.getSectorIdentifierUri())) {
@@ -102,14 +154,14 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
                         builder = Response.status(Response.Status.BAD_REQUEST.getStatusCode());
                         builder.entity(errorResponseFactory.getErrorAsJson(RegisterErrorResponseType.INVALID_REDIRECT_URI));
                     } else {
-                        String clientsBaseDN = ConfigurationFactory.getBaseDn().getClients();
+                        String clientsBaseDN = ConfigurationFactory.instance().getBaseDn().getClients();
 
                         String inum = inumService.generateClientInum();
                         String generatedClientSecret = UUID.randomUUID().toString();
 
                         String[] scopes = new String[0];
-                        if (ConfigurationFactory.getConfiguration().getDynamicRegistrationScopesParamEnabled() != null
-                                && ConfigurationFactory.getConfiguration().getDynamicRegistrationScopesParamEnabled()
+                        if (ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationScopesParamEnabled() != null
+                                && ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationScopesParamEnabled()
                                 && r.getScopes().size() > 0) {
                             scopes = scopeService.getScopesDn(r.getScopes()).toArray(scopes);
                         } else {
@@ -123,31 +175,11 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
                         client.setScopes(scopes);
                         client.setRegistrationAccessToken(HandleTokenFactory.generateHandleToken());
 
-                        if (r.getSubjectType() != null && r.getSubjectType().equals(SubjectType.PAIRWISE)) {
-                            String salt = UUID.randomUUID().toString();
-                            SubjectIdentifierGenerator subjectIdentifierGenerator = new SubjectIdentifierGenerator(salt);
-                            String sectorIdentifier = null;
-
-                            if (StringUtils.isNotBlank(r.getSectorIdentifierUri())) {
-                                URI uri = new URI(r.getSectorIdentifierUri());
-                                sectorIdentifier = uri.getHost();
-                            } else {
-                                URI uri = new URI(r.getRedirectUris().get(0));
-                                sectorIdentifier = uri.getHost();
-                            }
-
-                            String pairwiseSubjectIdentifier = subjectIdentifierGenerator.generatePairwiseSubjectIdentifier(
-                                    sectorIdentifier, inum, generatedClientSecret.getBytes());
-                            client.setSubjectIdentifier(pairwiseSubjectIdentifier);
-                        } else {
-                            client.setSubjectIdentifier(inum);
-                        }
-
                         final Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
                         client.setClientIdIssuedAt(calendar.getTime());
 
-                        if (ConfigurationFactory.getConfiguration().getDynamicRegistrationExpirationTime() > 0) {
-                            calendar.add(Calendar.SECOND, ConfigurationFactory.getConfiguration().getDynamicRegistrationExpirationTime());
+                        if (ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationExpirationTime() > 0) {
+                            calendar.add(Calendar.SECOND, ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationExpirationTime());
                             client.setClientSecretExpiresAt(calendar.getTime());
                         }
 
@@ -167,6 +199,10 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
                         if (externalDynamicClientRegistrationService.isEnabled()) {
                             externalDynamicClientRegistrationService.executeExternalUpdateClientMethods(r, client);
                         }
+                        
+                        Date currentTime = Calendar.getInstance().getTime();
+                        client.setLastAccessTime(currentTime);
+                        client.setLastLogonTime(currentTime);
 
                         clientService.persist(client);
 
@@ -196,7 +232,7 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
         builder.cacheControl(ServerUtil.cacheControl(true, false));
         builder.header("Pragma", "no-cache");
         return builder.build();
-    }
+	}
 
     public Response.ResponseBuilder internalErrorResponse() {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
@@ -357,7 +393,7 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
         Response.ResponseBuilder builder = Response.ok();
 
         try {
-            if (ConfigurationFactory.getConfiguration().getDynamicRegistrationEnabled()) {
+            if (ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationEnabled()) {
                 if (RegisterParamsValidator.validateParamsClientRead(clientId, accessToken)) {
                     Client client = clientService.getClient(clientId, accessToken);
                     if (client != null) {
@@ -406,7 +442,7 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
         Util.addToJSONObjectIfNotNull(responseJsonObject, CLIENT_SECRET.toString(), client.getClientSecret());
         Util.addToJSONObjectIfNotNull(responseJsonObject, RegisterResponseParam.REGISTRATION_ACCESS_TOKEN.toString(), client.getRegistrationAccessToken());
         Util.addToJSONObjectIfNotNull(responseJsonObject, REGISTRATION_CLIENT_URI.toString(),
-                ConfigurationFactory.getConfiguration().getRegistrationEndpoint() + "?" +
+                ConfigurationFactory.instance().getConfiguration().getRegistrationEndpoint() + "?" +
                         RegisterResponseParam.CLIENT_ID.toString() + "=" + client.getClientId());
         responseJsonObject.put(CLIENT_ID_ISSUED_AT.toString(), client.getClientIdIssuedAt().getTime() / 1000);
         responseJsonObject.put(CLIENT_SECRET_EXPIRES_AT.toString(), client.getClientSecretExpiresAt() != null && client.getClientSecretExpiresAt().getTime() > 0 ?
@@ -468,13 +504,13 @@ public class RegisterRestWebServiceImpl implements RegisterRestWebService {
      */
     private static void putCustomStuffIntoObject(Client p_client, JSONObject p_requestObject) throws JSONException {
         // custom object class
-        final String customOC = ConfigurationFactory.getConfiguration().getDynamicRegistrationCustomObjectClass();
+        final String customOC = ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationCustomObjectClass();
         if (StringUtils.isNotBlank(customOC)) {
             p_client.setCustomObjectClasses(new String[]{customOC});
         }
 
         // custom attributes (custom attributes must be in custom object class)
-        final List<String> attrList = ConfigurationFactory.getConfiguration().getDynamicRegistrationCustomAttributes();
+        final List<String> attrList = ConfigurationFactory.instance().getConfiguration().getDynamicRegistrationCustomAttributes();
         if (attrList != null && !attrList.isEmpty()) {
             final Log staticLog = Logging.getLog(RegisterRestWebServiceImpl.class);
             for (String attr : attrList) {

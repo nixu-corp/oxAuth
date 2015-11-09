@@ -211,10 +211,10 @@ class PersonAuthentication(PersonAuthenticationType):
  
                     newUser = User()
                     for attributesMappingEntry in currentAttributesMapping.entrySet():
-                        idpAttribute = attributesMappingEntry.getKey()
+                        remoteAttribute = attributesMappingEntry.getKey()
                         localAttribute = attributesMappingEntry.getValue()
  
-                        localAttributeValue = gplusResponseNormalizedAttributes.get(idpAttribute)
+                        localAttributeValue = gplusResponseNormalizedAttributes.get(remoteAttribute)
                         if (localAttribute != None):
                             newUser.setAttribute(localAttribute, localAttributeValue)
  
@@ -227,7 +227,7 @@ class PersonAuthentication(PersonAuthenticationType):
                     newUser.setAttribute("oxExternalUid", "gplus:" + gplusUserUid)
                     print "Google+ Authenticate for step 1. Attempting to add user", gplusUserUid, " with next attributes", newUser.getCustomAttributes()
  
-                    foundUser = userService.addUser(newUser)
+                    foundUser = userService.addUser(newUser, True)
                     print "Google+ Authenticate for step 1. Added new user with UID", foundUser.getUserId()
 
                 foundUserName = foundUser.getUserId()
@@ -246,7 +246,7 @@ class PersonAuthentication(PersonAuthenticationType):
 
                 return postLoginResult
             else:
-                # Check if the is user with specified gplusUserUid
+                # Check if there is user with specified gplusUserUid
                 print "Google+ Authenticate for step 1. Attempting to find user by uid:", gplusUserUid
 
                 foundUser = userService.getUser(gplusUserUid)
@@ -367,13 +367,6 @@ class PersonAuthentication(PersonAuthenticationType):
     def logout(self, configurationAttributes, requestParameters):
         # TODO Revoke token
         return True
-
-    def isPassedStep1():
-        credentials = Identity.instance().getCredentials()
-        userName = credentials.getUsername()
-        passedStep1 = StringHelper.isNotEmptyString(userName)
-
-        return passedStep1
 
     def loadClientSecrets(self, clientSecretsFile):
         clientSecrets = None

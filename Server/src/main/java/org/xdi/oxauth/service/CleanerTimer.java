@@ -25,6 +25,7 @@ import org.jboss.seam.annotations.async.Asynchronous;
 import org.jboss.seam.async.TimerSchedule;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.log.Log;
+import org.xdi.model.ApplicationType;
 import org.xdi.oxauth.model.common.AuthorizationGrant;
 import org.xdi.oxauth.model.common.AuthorizationGrantList;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
@@ -63,6 +64,9 @@ public class CleanerTimer {
     
     @In
     private RequestService u2fRequestService;
+    
+    @In
+    private MetricService metricService;
 
     private AtomicBoolean isActive;
 
@@ -71,7 +75,7 @@ public class CleanerTimer {
         log.debug("Initializing CleanerTimer");
         this.isActive = new AtomicBoolean(false);
 
-        long interval = ConfigurationFactory.getConfiguration().getCleanServiceInterval();
+        long interval = ConfigurationFactory.instance().getConfiguration().getCleanServiceInterval();
         if (interval <= 0) {
             interval = DEFAULT_INTERVAL;
         }
@@ -100,15 +104,17 @@ public class CleanerTimer {
             this.resourceSetPermissionManager.cleanupResourceSetPermissions(now);
             
             processU2fRequests();
+
+            processMetricEntries();
         } finally {
             this.isActive.set(false);
         }
     }
 
-    private void processAuthorizationGrantList() {
+	private void processAuthorizationGrantList() {
         log.debug("Start AuthorizationGrant clean up");
 
-        switch (ConfigurationFactory.getConfiguration().getModeEnum()) {
+        switch (ConfigurationFactory.instance().getConfiguration().getModeEnum()) {
             case IN_MEMORY:
                 final List<AuthorizationGrant> grantList = authorizationGrantList.getAuthorizationGrants();
 
@@ -176,5 +182,19 @@ public class CleanerTimer {
 
         log.debug("End U2F request clean up");
     }
+
+    private void processMetricEntries() {
+        log.debug("Start metric entries clean up");
+
+        int keepDataDays = ConfigurationFactory.instance().getConfiguration().getMetricReporterKeepDataDays();
+
+        Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		calendar.add(Calendar.DATE, -keepDataDays);
+        Date expirationDate = calendar.getTime();
+        
+        metricService.removeExpiredMetricEntries(expirationDate, ApplicationType.OX_AUTH, metricService.applianceInum());
+        
+        log.debug("End metric entries clean up");
+	}
 
 }

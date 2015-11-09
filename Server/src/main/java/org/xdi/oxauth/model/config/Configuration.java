@@ -21,6 +21,7 @@ import java.util.List;
  *
  * @author Javier Rojas Blum
  * @author Yuriy Zabrovarnyy
+ * @author Yuriy Movchan
  * @version 0.9 February 25, 2015
  */
 @XmlRootElement(name = "configuration")
@@ -48,6 +49,7 @@ public class Configuration {
     private String idGenerationEndpoint;
     private String introspectionEndpoint;
     private String umaConfigurationEndpoint;
+    private String openidSubAttribute;
     private List<String> responseTypesSupported;
     private List<String> grantTypesSupported;
     private List<String> acrValuesSupported;
@@ -120,6 +122,8 @@ public class Configuration {
     private String cssLocation;
     private String jsLocation;
     private String imgLocation;
+	private int metricReporterInterval;
+	private int metricReporterKeepDataDays;
 
     @XmlElement(name = "uma-keep-client-during-resource-set-registration")
     public Boolean getUmaKeepClientDuringResourceSetRegistration() {
@@ -434,7 +438,16 @@ public class Configuration {
         umaConfigurationEndpoint = p_umaConfigurationEndpoint;
     }
 
-    @XmlElement(name = "id-generation-endpoint")
+    @XmlElement(name = "openid-sub-attribute")
+    public String getOpenidSubAttribute() {
+		return openidSubAttribute;
+	}
+
+	public void setOpenidSubAttribute(String openidSubAttribute) {
+		this.openidSubAttribute = openidSubAttribute;
+	}
+
+	@XmlElement(name = "id-generation-endpoint")
     public String getIdGenerationEndpoint() {
         return idGenerationEndpoint;
     }
@@ -1067,5 +1080,23 @@ public class Configuration {
     public void setImgLocation(String imgLocation) {
         this.imgLocation = imgLocation;
     }
+
+    @XmlElement(name = "metric-reporter-interval")
+    public int getMetricReporterInterval() {
+        return metricReporterInterval;
+    }
+
+    public void setMetricReporterInterval(int metricReporterInterval) {
+    	this.metricReporterInterval = metricReporterInterval;
+    }
+
+    @XmlElement(name = "metric-reporter-keep-data-days")
+    public int getMetricReporterKeepDataDays() {
+        return metricReporterKeepDataDays;
+    }
+
+	public void setMetricReporterKeepDataDays(int metricReporterKeepDataDays) {
+		this.metricReporterKeepDataDays = metricReporterKeepDataDays;
+	}
 
 }
