@@ -6,6 +6,14 @@
 
 package org.xdi.oxauth.auth;
 
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
@@ -36,13 +44,6 @@ import org.xdi.oxauth.service.ClientService;
 import org.xdi.oxauth.service.SessionIdService;
 import org.xdi.oxauth.service.external.ExternalAuthenticationService;
 import org.xdi.util.StringHelper;
-
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Authenticator component
@@ -189,7 +190,7 @@ public class Authenticator implements Serializable {
             return false;
         }
 
-	    // Set in event context sessionAttributs to allow access them from external authenticator
+	    // Set in event context sessionAttributes to allow access them from external authenticator
 	    Context eventContext = Contexts.getEventContext();
 	    eventContext.set("sessionAttributes", sessionIdAttributes);
 
@@ -441,7 +442,7 @@ public class Authenticator implements Serializable {
     }
 
     public boolean authenticateBySessionId(String p_sessionId) {
-        if (StringUtils.isNotBlank(p_sessionId) && ConfigurationFactory.getConfiguration().getSessionIdEnabled()) {
+        if (StringUtils.isNotBlank(p_sessionId) && ConfigurationFactory.instance().getConfiguration().getSessionIdEnabled()) {
             try {
                 SessionId sessionId = sessionIdService.getSessionId(p_sessionId);
                 return authenticateBySessionId(sessionId);

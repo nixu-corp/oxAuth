@@ -16,6 +16,13 @@
         </classes>
     </test>
 
+    <!-- Authorization Response Mode -->
+    <test name="Authorization Response Mode (HTTP)" enabled="true">
+        <classes>
+            <class name="org.xdi.oxauth.ws.rs.AuthorizationResponseModeHttpTest"/>
+        </classes>
+    </test>
+
     <!-- Authorize test -->
     <test name="Authorize test (HTTP)" enabled="true">
         <classes>
@@ -27,6 +34,13 @@
     <test name="Client Authentication Filter test (HTTP)" enabled="true">
         <classes>
             <class name="org.xdi.oxauth.ws.rs.ClientAuthenticationFilterHttpTest"/>
+        </classes>
+    </test>
+
+    <!-- Client Credentials Grant test -->
+    <test name="Client Credentials Grant test (HTTP)" enabled="true">
+        <classes>
+            <class name="org.xdi.oxauth.ws.rs.ClientCredentialsGrantHttpTest"/>
         </classes>
     </test>
 
@@ -62,6 +76,13 @@
     <test name="OpenID Request Object test (HTTP)" enabled="true">
         <classes>
             <class name="org.xdi.oxauth.ws.rs.OpenIDRequestObjectHttpTest"/>
+        </classes>
+    </test>
+
+    <!-- PersistClientAuthorizationsHttpTest -->
+    <test name="Persist Client Authorizations test (HTTP)" enabled="true">
+        <classes>
+            <class name="org.xdi.oxauth.ws.rs.PersistClientAuthorizationsHttpTest"/>
         </classes>
     </test>
 

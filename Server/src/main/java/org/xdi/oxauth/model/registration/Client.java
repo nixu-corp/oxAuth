@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * @author Javier Rojas Blum
- * @version 0.9 May 18, 2015
+ * @version October 16, 2015
  */
 @LdapEntry
 @LdapObjectClass(values = {"top", "oxAuthClient"})
@@ -40,6 +40,9 @@ public class Client {
 
     @LdapAttribute(name = "oxAuthClientSecret")
     private String encodedClientSecret;
+
+    @LdapAttribute(name = "oxAuthLogoutURI")
+    private String logoutUri;
 
     @LdapAttribute(name = "oxAuthRegistrationAccessToken")
     private String registrationAccessToken;
@@ -149,8 +152,14 @@ public class Client {
     @LdapAttribute(name = "oxAuthFederationMetadataURI")
     private String federationURI;
 
-    @LdapAttribute(name = "oxAuthSubjectIdentifier")
-    private String subjectIdentifier;
+    @LdapAttribute(name = "oxLastAccessTime")
+    private Date lastAccessTime;
+
+    @LdapAttribute(name = "oxLastLogonTime")
+    private Date lastLogonTime;
+
+    @LdapAttribute(name = "oxPersistClientAuthorizations")
+    private Boolean persistClientAuthorizations;
 
     @LdapAttributesList(name = "name", value = "values", sortByName = true)
     private List<CustomAttribute> customAttributes = new ArrayList<CustomAttribute>();
@@ -168,6 +177,24 @@ public class Client {
 
     public void setDn(String dn) {
         this.dn = dn;
+    }
+
+    /**
+     * Gets logout uri
+     *
+     * @return logout uri
+     */
+    public String getLogoutUri() {
+        return logoutUri;
+    }
+
+    /**
+     * Sets logout uri.
+     *
+     * @param logoutUri logout uri
+     */
+    public void setLogoutUri(String logoutUri) {
+        this.logoutUri = logoutUri;
     }
 
     /**
@@ -896,12 +923,28 @@ public class Client {
         federationURI = p_federationURI;
     }
 
-    public String getSubjectIdentifier() {
-        return subjectIdentifier;
+    public Date getLastAccessTime() {
+        return lastAccessTime;
     }
 
-    public void setSubjectIdentifier(String subjectIdentifier) {
-        this.subjectIdentifier = subjectIdentifier;
+    public void setLastAccessTime(Date lastAccessTime) {
+        this.lastAccessTime = lastAccessTime;
+    }
+
+    public Date getLastLogonTime() {
+        return lastLogonTime;
+    }
+
+    public void setLastLogonTime(Date lastLogonTime) {
+        this.lastLogonTime = lastLogonTime;
+    }
+
+    public Boolean getPersistClientAuthorizations() {
+        return persistClientAuthorizations;
+    }
+
+    public void setPersistClientAuthorizations(Boolean persistClientAuthorizations) {
+        this.persistClientAuthorizations = persistClientAuthorizations;
     }
 
     public List<CustomAttribute> getCustomAttributes() {
@@ -927,7 +970,7 @@ public class Client {
     public static String buildClientDn(String p_clientId) {
         final StringBuilder dn = new StringBuilder();
         dn.append(String.format("inum=%s,", p_clientId));
-        dn.append(ConfigurationFactory.getBaseDn().getClients()); // ou=clients,o=@!1111,o=gluu
+        dn.append(ConfigurationFactory.instance().getBaseDn().getClients()); // ou=clients,o=@!1111,o=gluu
         return dn.toString();
     }
 

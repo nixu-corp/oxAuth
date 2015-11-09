@@ -47,7 +47,7 @@ public class KeyGeneratorTimer {
         log.debug("Initializing KeyGeneratorTimer");
         this.isActive = new AtomicBoolean(false);
 
-        long interval = ConfigurationFactory.getConfiguration().getKeyRegenerationInterval();
+        long interval = ConfigurationFactory.instance().getConfiguration().getKeyRegenerationInterval();
         if (interval <= 0) {
             interval = DEFAULT_INTERVAL;
         }
@@ -59,7 +59,7 @@ public class KeyGeneratorTimer {
     @Observer(EVENT_TYPE)
     @Asynchronous
     public void process() {
-        if (!ConfigurationFactory.getConfiguration().getKeyRegenerationEnabled()) {
+        if (!ConfigurationFactory.instance().getConfiguration().getKeyRegenerationEnabled()) {
             return;
         }
 
@@ -72,13 +72,15 @@ public class KeyGeneratorTimer {
         }
 
         try {
-            String dn = ConfigurationFactory.getLdapConfiguration().getString("configurationEntryDN");
+            String dn = ConfigurationFactory.instance().getLdapConfiguration().getString("configurationEntryDN");
             Conf conf = ldapEntryManager.find(Conf.class, dn);
+            
+            long nextRevision = conf.getRevision() + 1;
             JSONObject jwks = new JSONObject(conf.getWebKeys());
             conf.setWebKeys(updateKeys(jwks).toString());
+            
+            conf.setRevision(nextRevision);
             ldapEntryManager.merge(conf);
-
-            ConfigurationFactory.updateFromLdap();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
@@ -108,8 +110,8 @@ public class KeyGeneratorTimer {
                 }
             } else {
                 GregorianCalendar expirationTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-                expirationTime.add(GregorianCalendar.HOUR, ConfigurationFactory.getConfiguration().getKeyRegenerationInterval());
-                expirationTime.add(GregorianCalendar.SECOND, ConfigurationFactory.getConfiguration().getIdTokenLifetime());
+                expirationTime.add(GregorianCalendar.HOUR, ConfigurationFactory.instance().getConfiguration().getKeyRegenerationInterval());
+                expirationTime.add(GregorianCalendar.SECOND, ConfigurationFactory.instance().getConfiguration().getIdTokenLifetime());
                 key.put("expirationTime", expirationTime.getTimeInMillis());
 
                 jsonObject.getJSONArray("keys").put(key);
@@ -123,8 +125,8 @@ public class KeyGeneratorTimer {
         JSONArray keys = new JSONArray();
 
         GregorianCalendar expirationTime = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        expirationTime.add(GregorianCalendar.HOUR, ConfigurationFactory.getConfiguration().getKeyRegenerationInterval());
-        expirationTime.add(GregorianCalendar.SECOND, ConfigurationFactory.getConfiguration().getIdTokenLifetime());
+        expirationTime.add(GregorianCalendar.HOUR, ConfigurationFactory.instance().getConfiguration().getKeyRegenerationInterval());
+        expirationTime.add(GregorianCalendar.SECOND, ConfigurationFactory.instance().getConfiguration().getIdTokenLifetime());
 
         keys.put(KeyGenerator.generateRS256Keys(expirationTime.getTimeInMillis()));
         keys.put(KeyGenerator.generateRS384Keys(expirationTime.getTimeInMillis()));

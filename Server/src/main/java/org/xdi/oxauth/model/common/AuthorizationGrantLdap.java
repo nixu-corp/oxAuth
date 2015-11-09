@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Yuriy Zabrovarnyy
  * @author Javier Rojas Blum
- * @version June 3, 2015
+ * @version September 16, 2015
  */
 
 public class AuthorizationGrantLdap extends AbstractAuthorizationGrant {
@@ -121,7 +121,9 @@ public class AuthorizationGrantLdap extends AbstractAuthorizationGrant {
     public RefreshToken createRefreshToken() {
         try {
             final RefreshToken refreshToken = super.createRefreshToken();
-            persist(asToken(refreshToken));
+            if (refreshToken.getExpiresIn() > 0) {
+            	persist(asToken(refreshToken));
+            }
             return refreshToken;
         } catch (Exception e) {
             LOGGER.trace(e.getMessage(), e);
@@ -198,13 +200,14 @@ public class AuthorizationGrantLdap extends AbstractAuthorizationGrant {
 
         final TokenLdap result = new TokenLdap();
 
-        result.setDn(GrantService.buildDn(id, getClientId()));
+        result.setDn(GrantService.buildDn(id, getGrantId(), getClientId()));
         result.setId(id);
         result.setGrantId(getGrantId());
         result.setCreationDate(p_token.getCreationDate());
         result.setExpirationDate(p_token.getExpirationDate());
         result.setTokenCode(p_token.getCode());
         result.setUserId(getUserId());
+        result.setClientId(getClientId());
         result.setScope(getScopesAsString());
         result.setAuthMode(p_token.getAuthMode());
         result.setAuthenticationTime(getAuthenticationTime() != null ? getAuthenticationTime().toString() : "");

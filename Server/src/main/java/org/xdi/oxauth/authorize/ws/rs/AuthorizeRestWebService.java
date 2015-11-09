@@ -6,9 +6,7 @@
 
 package org.xdi.oxauth.authorize.ws.rs;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +27,7 @@ import javax.ws.rs.core.SecurityContext;
  * </p>
  *
  * @author Javier Rojas Blum
- * @version 0.9 April 27, 2015
+ * @version October 1, 2015
  */
 @Path("/oxauth")
 @Api(value = "/oxauth", description = "The Authorization Endpoint performs Authentication of the End-User. This is done by sending the User Agent to the Authorization Server's Authorization Endpoint for Authentication and Authorization, using request parameters defined by OAuth 2.0 and additional parameters and parameter values defined by OpenID Connect.")
@@ -49,6 +47,9 @@ public interface AuthorizeRestWebService {
      *                         this value when redirecting the user-agent back to the client.
      *                         The parameter should be used for preventing cross-site request
      *                         forgery.
+     * @param responseMode     Informs the Authorization Server of the mechanism to be used for returning parameters
+     *                         from the Authorization Endpoint. This use of this parameter is NOT RECOMMENDED when the
+     *                         Response Mode that would be requested is the default mode specified for the Response Type.
      * @param nonce            A string value used to associate a user agent session with an ID Token,
      *                         and to mitigate replay attacks.
      * @param display          An ASCII string value that specifies how the Authorization Server displays the
@@ -130,10 +131,30 @@ public interface AuthorizeRestWebService {
     @Produces({MediaType.TEXT_PLAIN})
     @ApiOperation(
             value = "Performs authorization.",
-            notes = "Performs authorization.",
+            notes = "The Authorization Endpoint performs Authentication of the End-User.",
             response = Response.class,
             responseContainer = "JSON"
     )
+    @ApiResponses(value = {
+            @ApiResponse(code = 302, message = "interaction_required\n" +
+                    "    The Authorization Server requires End-User interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User interaction. "),
+            @ApiResponse(code = 302, message = "login_required\n" +
+                    "    The Authorization Server requires End-User authentication. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User authentication. "),
+            @ApiResponse(code = 302, message = "account_selection_required\n" +
+                    "    The End-User is REQUIRED to select a session at the Authorization Server. The End-User MAY be authenticated at the Authorization Server with different associated accounts, but the End-User did not select a session. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface to prompt for a session to use. "),
+            @ApiResponse(code = 302, message = "consent_required\n" +
+                    "    The Authorization Server requires End-User consent. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User consent. "),
+            @ApiResponse(code = 302, message = "invalid_request_uri\n" +
+                    "    The request_uri in the Authorization Request returns an error or contains invalid data. "),
+            @ApiResponse(code = 302, message = "invalid_request_object\n" +
+                    "    The request parameter contains an invalid Request Object. "),
+            @ApiResponse(code = 302, message = "request_not_supported\n" +
+                    "    The OP does not support use of the request parameter"),
+            @ApiResponse(code = 302, message = "request_uri_not_supported\n" +
+                    "    The OP does not support use of the request_uri parameter"),
+            @ApiResponse(code = 302, message = "registration_not_supported\n" +
+                    "    The OP does not support use of the registration parameter")
+    })
     Response requestAuthorizationGet(
             @QueryParam("scope")
             @ApiParam(value = "OpenID Connect requests MUST contain the openid scope value. If the openid scope value is not present, the behavior is entirely unspecified. Other scope values MAY be present. Scope values used that are not understood by an implementation SHOULD be ignored.", required = true)
@@ -207,10 +228,30 @@ public interface AuthorizeRestWebService {
     @Produces({MediaType.TEXT_PLAIN})
     @ApiOperation(
             value = "Performs authorization.",
-            notes = "Performs authorization.",
+            notes = "The Authorization Endpoint performs Authentication of the End-User.",
             response = Response.class,
             responseContainer = "JSON"
     )
+    @ApiResponses(value = {
+            @ApiResponse(code = 302, message = "interaction_required\n" +
+                    "    The Authorization Server requires End-User interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User interaction. "),
+            @ApiResponse(code = 302, message = "login_required\n" +
+                    "    The Authorization Server requires End-User authentication. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User authentication. "),
+            @ApiResponse(code = 302, message = "account_selection_required\n" +
+                    "    The End-User is REQUIRED to select a session at the Authorization Server. The End-User MAY be authenticated at the Authorization Server with different associated accounts, but the End-User did not select a session. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface to prompt for a session to use. "),
+            @ApiResponse(code = 302, message = "consent_required\n" +
+                    "    The Authorization Server requires End-User consent. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for End-User consent. "),
+            @ApiResponse(code = 302, message = "invalid_request_uri\n" +
+                    "    The request_uri in the Authorization Request returns an error or contains invalid data. "),
+            @ApiResponse(code = 302, message = "invalid_request_object\n" +
+                    "    The request parameter contains an invalid Request Object. "),
+            @ApiResponse(code = 302, message = "request_not_supported\n" +
+                    "    The OP does not support use of the request parameter"),
+            @ApiResponse(code = 302, message = "request_uri_not_supported\n" +
+                    "    The OP does not support use of the request_uri parameter"),
+            @ApiResponse(code = 302, message = "registration_not_supported\n" +
+                    "    The OP does not support use of the registration parameter")
+    })
     Response requestAuthorizationPost(
             @FormParam("scope")
             @ApiParam(value = "OpenID Connect requests MUST contain the openid scope value. If the openid scope value is not present, the behavior is entirely unspecified. Other scope values MAY be present. Scope values used that are not understood by an implementation SHOULD be ignored.", required = true)

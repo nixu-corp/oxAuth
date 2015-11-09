@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.xdi</groupId>
         <artifactId>oxauth</artifactId>
-        <version>3.0.2-SNAPSHOT</version>
+        <version>3.0.3-SNAPSHOT</version>
     </parent>
 
     <prerequisites>
@@ -663,6 +663,10 @@
             <groupId>com.wordnik</groupId>
             <artifactId>swagger-servlet_2.9.1</artifactId>
         </dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+		</dependency>
     </dependencies>
 
     <profiles>
@@ -732,36 +736,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-        </profile>
-
-        <profile>
-            <id>wikid</id>
-            <activation>
-            </activation>
-            <properties>
-            </properties>
-            <build>
-                <plugins>
-                </plugins>
-            </build>
-            <repositories>
-                <repository>
-                    <id>wikid-local</id>
-                    <url>file://${project.basedir}/integrations/wikid/repository</url>
-                </repository>
-            </repositories>
-            <dependencies>
-                <dependency>
-                    <groupId>com.wikidsystems</groupId>
-                    <artifactId>wClient</artifactId>
-                    <version>3.4.85</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.jdom</groupId>
-                    <artifactId>jdom</artifactId>
-                    <version>1.1.3</version>
-                </dependency>
-            </dependencies>
         </profile>
 
         <profile>

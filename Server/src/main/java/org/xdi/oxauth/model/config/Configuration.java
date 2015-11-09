@@ -6,24 +6,24 @@
 
 package org.xdi.oxauth.model.config;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.xdi.oxauth.model.common.Mode;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.xdi.oxauth.model.common.Mode;
 
 /**
  * Represents the configuration XML file.
  *
  * @author Javier Rojas Blum
  * @author Yuriy Zabrovarnyy
- * @version 0.9 February 25, 2015
+ * @author Yuriy Movchan
+ * @version October 16, 2015
  */
-@XmlRootElement(name = "configuration")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Configuration {
 
@@ -48,9 +48,9 @@ public class Configuration {
     private String idGenerationEndpoint;
     private String introspectionEndpoint;
     private String umaConfigurationEndpoint;
+    private String openidSubAttribute;
     private List<String> responseTypesSupported;
     private List<String> grantTypesSupported;
-    private List<String> acrValuesSupported;
     private List<String> subjectTypesSupported;
     private List<String> userInfoSigningAlgValuesSupported;
     private List<String> userInfoEncryptionAlgValuesSupported;
@@ -93,6 +93,7 @@ public class Configuration {
     private String oxId;
     private Boolean dynamicRegistrationEnabled;
     private int dynamicRegistrationExpirationTime;
+    private Boolean dynamicRegistrationPersistClientAuthorizations;
     private Boolean trustedClientEnabled;
     private Boolean dynamicRegistrationScopesParamEnabled;
     private String dynamicRegistrationCustomObjectClass;
@@ -108,8 +109,6 @@ public class Configuration {
     private List<AuthenticationFilter> authenticationFilters;
     private List<ClientAuthenticationFilter> clientAuthenticationFilters;
 
-    private Boolean externalAuthenticatorEnabled;
-
     private String applianceInum;
     private int sessionIdUnusedLifetime;
     private int sessionIdUnauthenticatedUnusedLifetime = 120; // 120 seconds
@@ -120,6 +119,8 @@ public class Configuration {
     private String cssLocation;
     private String jsLocation;
     private String imgLocation;
+    private int metricReporterInterval;
+    private int metricReporterKeepDataDays;
 
     @XmlElement(name = "uma-keep-client-during-resource-set-registration")
     public Boolean getUmaKeepClientDuringResourceSetRegistration() {
@@ -434,6 +435,15 @@ public class Configuration {
         umaConfigurationEndpoint = p_umaConfigurationEndpoint;
     }
 
+    @XmlElement(name = "openid-sub-attribute")
+    public String getOpenidSubAttribute() {
+        return openidSubAttribute;
+    }
+
+    public void setOpenidSubAttribute(String openidSubAttribute) {
+        this.openidSubAttribute = openidSubAttribute;
+    }
+
     @XmlElement(name = "id-generation-endpoint")
     public String getIdGenerationEndpoint() {
         return idGenerationEndpoint;
@@ -479,16 +489,6 @@ public class Configuration {
 
     public void setGrantTypesSupported(List<String> grantTypesSupported) {
         this.grantTypesSupported = grantTypesSupported;
-    }
-
-    @XmlElementWrapper(name = "acr-values-supported")
-    @XmlElement(name = "acr")
-    public List<String> getAcrValuesSupported() {
-        return acrValuesSupported;
-    }
-
-    public void setAcrValuesSupported(List<String> acrValuesSupported) {
-        this.acrValuesSupported = acrValuesSupported;
     }
 
     @XmlElementWrapper(name = "subject-types-supported")
@@ -868,6 +868,15 @@ public class Configuration {
         this.dynamicRegistrationExpirationTime = dynamicRegistrationExpirationTime;
     }
 
+    @XmlElement(name = "dynamic-registration-persist-client-authorizations")
+    public Boolean getDynamicRegistrationPersistClientAuthorizations() {
+        return dynamicRegistrationPersistClientAuthorizations;
+    }
+
+    public void setDynamicRegistrationPersistClientAuthorizations(Boolean dynamicRegistrationPersistClientAuthorizations) {
+        this.dynamicRegistrationPersistClientAuthorizations = dynamicRegistrationPersistClientAuthorizations;
+    }
+
     @XmlElement(name = "trusted-client-enabled")
     public Boolean getTrustedClientEnabled() {
         return trustedClientEnabled;
@@ -978,15 +987,6 @@ public class Configuration {
         return clientAuthenticationFilters;
     }
 
-    @XmlElement(name = "external-auth-enabled")
-    public Boolean getExternalAuthenticatorEnabled() {
-        return externalAuthenticatorEnabled;
-    }
-
-    public void setExternalAuthenticatorEnabled(Boolean externalAuthenticatorEnabled) {
-        this.externalAuthenticatorEnabled = externalAuthenticatorEnabled;
-    }
-
     @XmlElement(name = "appliance-inum")
     public String getApplianceInum() {
         return applianceInum;
@@ -1066,6 +1066,24 @@ public class Configuration {
 
     public void setImgLocation(String imgLocation) {
         this.imgLocation = imgLocation;
+    }
+
+    @XmlElement(name = "metric-reporter-interval")
+    public int getMetricReporterInterval() {
+        return metricReporterInterval;
+    }
+
+    public void setMetricReporterInterval(int metricReporterInterval) {
+        this.metricReporterInterval = metricReporterInterval;
+    }
+
+    @XmlElement(name = "metric-reporter-keep-data-days")
+    public int getMetricReporterKeepDataDays() {
+        return metricReporterKeepDataDays;
+    }
+
+    public void setMetricReporterKeepDataDays(int metricReporterKeepDataDays) {
+        this.metricReporterKeepDataDays = metricReporterKeepDataDays;
     }
 
 }

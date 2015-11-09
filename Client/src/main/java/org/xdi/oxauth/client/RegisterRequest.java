@@ -31,7 +31,7 @@ import static org.xdi.oxauth.model.util.StringUtils.toJSONArray;
  *
  * @author Javier Rojas Blum
  * @author Yuriy Zabrovarnyy
- * @version June 3, 2015
+ * @version September 1, 2015
  */
 public class RegisterRequest extends BaseRequest {
 
@@ -46,6 +46,7 @@ public class RegisterRequest extends BaseRequest {
     private String clientUri;
     private AuthenticationMethod tokenEndpointAuthMethod;
     private String policyUri;
+    private String logoutUri;
     private String tosUri;
     private String jwksUri;
     private String jwks;
@@ -132,6 +133,23 @@ public class RegisterRequest extends BaseRequest {
      */
     public void setAccessToken(String registrationAccessToken) {
         this.registrationAccessToken = registrationAccessToken;
+    }
+
+    /**
+     * Gets logout uri.
+     * @return logout uri
+     */
+    public String getLogoutUri() {
+        return logoutUri;
+    }
+
+    /**
+     * Sets logout uri
+     *
+     * @param logoutUri logout uri
+     */
+    public void setLogoutUri(String logoutUri) {
+        this.logoutUri = logoutUri;
     }
 
     /**
@@ -983,7 +1001,7 @@ public class RegisterRequest extends BaseRequest {
         result.setJwks(requestObject.optString(JWKS.toString()));
         result.setSectorIdentifierUri(requestObject.optString(SECTOR_IDENTIFIER_URI.toString()));
         result.setSubjectType(requestObject.has(SUBJECT_TYPE.toString()) ?
-                SubjectType.fromString(requestObject.getString(SUBJECT_TYPE.toString())) : SubjectType.PUBLIC);
+                SubjectType.fromString(requestObject.getString(SUBJECT_TYPE.toString())) : null);
         result.setRequestObjectSigningAlg(requestObject.has(REQUEST_OBJECT_SIGNING_ALG.toString()) ?
                 SignatureAlgorithm.fromName(requestObject.getString(REQUEST_OBJECT_SIGNING_ALG.toString())) : null);
         return result;
