@@ -462,7 +462,8 @@ public class UserInfoRestWebServiceImpl implements UserInfoRestWebService {
                 }
             }
 
-            jsonWebResponse.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute("inum"));
+            String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
+            jsonWebResponse.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
         }
 
         if (authorizationGrant.getJwtAuthorizationRequest() != null

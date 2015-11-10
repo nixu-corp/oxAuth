@@ -20,6 +20,7 @@ import org.xdi.model.GluuAttribute;
 import org.xdi.oxauth.model.authorize.Claim;
 import org.xdi.oxauth.model.common.AccessToken;
 import org.xdi.oxauth.model.common.AuthorizationCode;
+import org.xdi.oxauth.model.common.AuthorizationGrantType;
 import org.xdi.oxauth.model.common.IAuthorizationGrant;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
 import org.xdi.oxauth.model.crypto.PublicKey;
@@ -220,9 +221,13 @@ public class IdTokenFactory {
             }
         }
 
-        String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
-        jwt.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
-
+        if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+        	jwt.getClaims().setSubjectIdentifier(authorizationGrant.getClient().getClientId());
+        } else {
+        	String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
+        	jwt.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+        }
+        
         if ((dynamicScopes.size() > 0) && externalDynamicScopeService.isEnabled()) {
             externalDynamicScopeService.executeExternalUpdateMethods(dynamicScopes, jwt, authorizationGrant.getUser());
         }
@@ -288,9 +293,13 @@ public class IdTokenFactory {
         jwe.getClaims().setExpirationTime(expiration);
         jwe.getClaims().setIssuedAt(issuedAt);
 
-        String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
-        jwe.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
-
+        if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+        	jwe.getClaims().setSubjectIdentifier(authorizationGrant.getClient().getClientId());
+        } else {
+        	String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
+        	jwe.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+        }
+        
         if (authorizationGrant.getAcrValues() != null) {
             jwe.getClaims().setClaim(JwtClaimName.AUTHENTICATION_CONTEXT_CLASS_REFERENCE, authorizationGrant.getAcrValues());
         }
