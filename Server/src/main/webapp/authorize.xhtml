@@ -66,7 +66,7 @@
                     <ul>
                         <c:forEach var="scope" items="#{authorizeAction.scopes}">
                             <li>
-                                #{scope.description}
+                                #{messages[scope.description]}
                             </li>
                         </c:forEach>
                     </ul>
