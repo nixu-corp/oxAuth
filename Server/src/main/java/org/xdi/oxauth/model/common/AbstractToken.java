@@ -6,21 +6,22 @@
 
 package org.xdi.oxauth.model.common;
 
-import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
-import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
-import org.xdi.oxauth.model.exception.InvalidJwtException;
-import org.xdi.oxauth.model.exception.SignatureException;
-import org.xdi.oxauth.model.registration.Client;
-import org.xdi.oxauth.model.token.HandleTokenFactory;
-import org.xdi.oxauth.model.util.JwtUtil;
-import org.xdi.util.security.StringEncrypter.EncryptionException;
-
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+
+import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
+import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
+import org.xdi.oxauth.model.exception.InvalidJwtException;
+import org.xdi.oxauth.model.exception.SignatureException;
+import org.xdi.oxauth.model.registration.Client;
+import org.xdi.oxauth.model.token.HandleTokenFactory;
+import org.xdi.oxauth.model.token.JwtHandleTokenFactory;
+import org.xdi.oxauth.model.util.JwtUtil;
+import org.xdi.util.security.StringEncrypter.EncryptionException;
 
 /**
  * <p>
@@ -67,7 +68,7 @@ public abstract class AbstractToken {
         	
         	try {
 				code = JwtHandleTokenFactory.generateHandleToken(client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims);
-			} catch (SignatureException e) {
+			} catch (java.security.SignatureException e) {
 				throw new RuntimeException("Token creation failed.", e);
 			} catch (InvalidJwtException e) {
 				throw new RuntimeException("Token creation failed.", e);
