@@ -135,7 +135,8 @@ public class AuthenticationFilter extends AbstractFilter {
         }
 
         if (requireAuth) {
-            sendError(p_httpResponse);
+            //sendError(p_httpResponse);
+        	p_filterChain.doFilter(p_httpRequest, p_httpResponse);
         }
     }
 
