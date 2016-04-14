@@ -122,6 +122,12 @@ public class Configuration {
     private int metricReporterInterval;
     private int metricReporterKeepDataDays;
 
+    private String tokenType;
+	private String tokenSigningType;
+	private String tokenSigningKey;
+	    
+	private List<String> jwtAccessTokenClaimsSupported;
+	
     @XmlElement(name = "uma-keep-client-during-resource-set-registration")
     public Boolean getUmaKeepClientDuringResourceSetRegistration() {
         return umaKeepClientDuringResourceSetRegistration;
@@ -1105,4 +1111,41 @@ public class Configuration {
         this.metricReporterKeepDataDays = metricReporterKeepDataDays;
     }
 
+    @XmlElement(name = "tokenType")
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
+	}
+
+	@XmlElement(name = "tokenSigningType")
+	public String getTokenSigningType() {
+		return tokenSigningType;
+	}
+
+	public void setTokenSigningType(String tokenSigningType) {
+		this.tokenSigningType = tokenSigningType;
+	}
+
+	@XmlElement(name = "tokenSigningKey")
+	public String getTokenSigningKey() {
+		return tokenSigningKey;
+	}
+
+	public void setTokenSigningKey(String tokenSigningKey) {
+		this.tokenSigningKey = tokenSigningKey;
+	}
+
+	@XmlElementWrapper(name = "jwt-access-token-claims-supported")
+    @XmlElement(name = "jwt-access-token-claim")
+	public List<String> getJwtAccessTokenClaimsSupported() {
+		return jwtAccessTokenClaimsSupported;
+	}
+
+	public void setJwtAccessTokenClaimsSupported(
+			List<String> jwtAccessTokenClaimsSupported) {
+		this.jwtAccessTokenClaimsSupported = jwtAccessTokenClaimsSupported;
+	}
 }
