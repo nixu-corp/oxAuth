@@ -6,6 +6,17 @@
 
 package org.xdi.oxauth.model.token;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.seam.Component;
@@ -20,6 +31,7 @@ import org.xdi.model.GluuAttribute;
 import org.xdi.oxauth.model.authorize.Claim;
 import org.xdi.oxauth.model.common.AccessToken;
 import org.xdi.oxauth.model.common.AuthorizationCode;
+import org.xdi.oxauth.model.common.AuthorizationGrantType;
 import org.xdi.oxauth.model.common.IAuthorizationGrant;
 import org.xdi.oxauth.model.common.SubjectType;
 import org.xdi.oxauth.model.config.ConfigurationFactory;
@@ -47,12 +59,6 @@ import org.xdi.oxauth.service.PairwiseIdentifierService;
 import org.xdi.oxauth.service.ScopeService;
 import org.xdi.oxauth.service.external.ExternalDynamicScopeService;
 import org.xdi.util.security.StringEncrypter;
-
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.util.*;
 
 /**
  * JSON Web Token (JWT) is a compact token format intended for space constrained
@@ -228,8 +234,12 @@ public class IdTokenFactory {
             }
             jwt.getClaims().setSubjectIdentifier(pairwiseIdentifier.getId());
         } else {
-            String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
-            jwt.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+        	if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+            	jwt.getClaims().setSubjectIdentifier(authorizationGrant.getClient().getClientId());
+            } else {
+            	String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
+            	jwt.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+            }
         }
 
         if ((dynamicScopes.size() > 0) && externalDynamicScopeService.isEnabled()) {
@@ -365,8 +375,12 @@ public class IdTokenFactory {
             }
             jwe.getClaims().setSubjectIdentifier(pairwiseIdentifier.getId());
         } else {
-            String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
-            jwe.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+        	if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+            	jwe.getClaims().setSubjectIdentifier(authorizationGrant.getClient().getClientId());
+            } else {
+            	String openidSubAttribute = configurationFactory.getConfiguration().getOpenidSubAttribute();
+            	jwe.getClaims().setSubjectIdentifier(authorizationGrant.getUser().getAttribute(openidSubAttribute));
+            }
         }
 
         if ((dynamicScopes.size() > 0) && externalDynamicScopeService.isEnabled()) {

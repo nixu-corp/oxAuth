@@ -130,6 +130,12 @@ public class Configuration {
     private String pairwiseCalculationKey;
     private String pairwiseCalculationSalt;
 
+    private String tokenType;
+	private String tokenSigningType;
+	private String tokenSigningKey;
+	    
+	private List<String> jwtAccessTokenClaimsSupported;
+	
     @XmlElement(name = "uma-rpt-as-jwt")
     public Boolean getUmaRptAsJwt() {
         return umaRptAsJwt;
@@ -1148,4 +1154,42 @@ public class Configuration {
     public void setPairwiseCalculationSalt(String pairwiseCalculationSalt) {
         this.pairwiseCalculationSalt = pairwiseCalculationSalt;
     }
+    
+    @XmlElement(name = "tokenType")
+	public String getTokenType() {
+		return tokenType;
+	}
+
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
+	}
+
+	@XmlElement(name = "tokenSigningType")
+	public String getTokenSigningType() {
+		return tokenSigningType;
+	}
+
+	public void setTokenSigningType(String tokenSigningType) {
+		this.tokenSigningType = tokenSigningType;
+	}
+
+	@XmlElement(name = "tokenSigningKey")
+	public String getTokenSigningKey() {
+		return tokenSigningKey;
+	}
+
+	public void setTokenSigningKey(String tokenSigningKey) {
+		this.tokenSigningKey = tokenSigningKey;
+	}
+
+	@XmlElementWrapper(name = "jwt-access-token-claims-supported")
+    @XmlElement(name = "jwt-access-token-claim")
+	public List<String> getJwtAccessTokenClaimsSupported() {
+		return jwtAccessTokenClaimsSupported;
+	}
+
+	public void setJwtAccessTokenClaimsSupported(
+			List<String> jwtAccessTokenClaimsSupported) {
+		this.jwtAccessTokenClaimsSupported = jwtAccessTokenClaimsSupported;
+	}    
 }

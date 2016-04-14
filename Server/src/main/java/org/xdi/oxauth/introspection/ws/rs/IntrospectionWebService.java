@@ -6,21 +6,6 @@
 
 package org.xdi.oxauth.introspection.ws.rs;
 
-import com.wordnik.swagger.annotations.Api;
-import org.apache.commons.lang.StringUtils;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Logger;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.log.Log;
-import org.xdi.oxauth.model.authorize.AuthorizeErrorResponseType;
-import org.xdi.oxauth.model.common.AbstractToken;
-import org.xdi.oxauth.model.common.AuthorizationGrant;
-import org.xdi.oxauth.model.common.AuthorizationGrantList;
-import org.xdi.oxauth.model.common.IntrospectionResponse;
-import org.xdi.oxauth.model.error.ErrorResponseFactory;
-import org.xdi.oxauth.service.token.TokenService;
-import org.xdi.oxauth.util.ServerUtil;
-
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -30,6 +15,24 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang.StringUtils;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.log.Log;
+import org.xdi.oxauth.model.authorize.AuthorizeErrorResponseType;
+import org.xdi.oxauth.model.common.AbstractToken;
+import org.xdi.oxauth.model.common.AuthorizationGrant;
+import org.xdi.oxauth.model.common.AuthorizationGrantList;
+import org.xdi.oxauth.model.common.AuthorizationGrantType;
+import org.xdi.oxauth.model.common.IntrospectionResponse;
+import org.xdi.oxauth.model.config.ConfigurationFactory;
+import org.xdi.oxauth.model.error.ErrorResponseFactory;
+import org.xdi.oxauth.service.token.TokenService;
+import org.xdi.oxauth.util.ServerUtil;
+
+import com.wordnik.swagger.annotations.Api;
 
 /**
  * @author Yuriy Zabrovarnyy
@@ -88,6 +91,39 @@ public class IntrospectionWebService {
                                 response.setExpiresAt(tokenToIntrospect.getExpirationDate());
                                 response.setIssuedAt(tokenToIntrospect.getCreationDate());
                                 response.setAcrValues(tokenToIntrospect.getAuthMode());
+                                
+                                if (tokenToIntrospect.isValid()) {
+                                	
+                                	if (authorizationGrant.getScopes() != null && authorizationGrant.getScopes().size() > 0) {
+                                		final StringBuilder sb = new StringBuilder();
+                                		for (String scope : authorizationGrant.getScopes()) {
+                                			sb.append(" ");
+                                			sb.append(scope);
+                                		}
+                                		if (sb.length() > 0) {
+                                			response.setScope(sb.substring(1));
+                                		}
+                                	}
+                                	
+                                	response.setClientId(authorizationGrant.getClientId());
+                                	response.setUsername(authorizationGrant.getUserId());
+                                	response.setIssuer(ConfigurationFactory.instance().getConfiguration().getIssuer());
+                                	
+                                	if (authorizationGrant.getAuthorizationGrantType() != null && authorizationGrant.getAuthorizationGrantType() == AuthorizationGrantType.CLIENT_CREDENTIALS) {
+                                		response.setSubject(authorizationGrant.getClientId());
+                                	} else {
+                                		
+                                		if (ConfigurationFactory.instance().getConfiguration().getOpenidSubAttribute() != null && authorizationGrant.getUser() != null) {
+                                		
+                                			Object attributeValue = authorizationGrant.getUser().getAttribute(ConfigurationFactory.instance().getConfiguration().getOpenidSubAttribute(), true);
+                                			if (attributeValue != null && attributeValue instanceof String) {
+                                				response.setSubject(attributeValue.toString());
+                                			}
+                                			
+                                		}
+                                		
+                                	}                                	
+                                }                                  
                             }
                         }
                         return Response.status(Response.Status.OK).entity(ServerUtil.asJson(response)).build();

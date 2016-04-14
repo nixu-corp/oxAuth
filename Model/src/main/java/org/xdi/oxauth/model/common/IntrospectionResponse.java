@@ -16,7 +16,7 @@ import java.util.Date;
  * @author Yuriy Zabrovarnyy
  * @version 0.9, 17/09/2013
  */
-@JsonPropertyOrder({"active", "exp", "iat", "acr_values"})
+@JsonPropertyOrder({"active", "exp", "iat", "acr_values", "scope", "client_id", "username", "iss", "sub"})
 // ignore jettison as it's recommended here: http://docs.jboss.org/resteasy/docs/2.3.4.Final/userguide/html/json.html
 @IgnoreMediaTypes("application/*+json")
 public class IntrospectionResponse {
@@ -30,6 +30,17 @@ public class IntrospectionResponse {
     @JsonProperty(value = "acr_values")
     private String acrValues;
 
+    @JsonProperty(value = "scope")
+    private String scope;
+    @JsonProperty(value = "client_id")
+    private String clientId;
+    @JsonProperty(value = "username")
+    private String username;
+    @JsonProperty(value = "iss")
+    private String issuer;
+    @JsonProperty(value = "sub")
+    private String subject;
+    
     public IntrospectionResponse() {
     }
 
@@ -68,4 +79,44 @@ public class IntrospectionResponse {
     public void setIssuedAt(Date p_issuedAt) {
         issuedAt = p_issuedAt;
     }
+    
+	public String getScope() {
+		return scope;
+	}
+
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getIssuer() {
+		return issuer;
+	}
+
+	public void setIssuer(String issuer) {
+		this.issuer = issuer;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}    
 }
