@@ -217,16 +217,6 @@ public abstract class AbstractAuthorizationGrant implements IAuthorizationGrant 
     @Override
     public AccessToken createAccessToken() {
         int lifetime = ConfigurationFactory.instance().getConfiguration().getShortLivedAccessTokenLifetime();
-        AccessToken accessToken = new AccessToken(lifetime);
-
-        accessToken.setAuthMode(getAcrValues());
-
-        return accessToken;
-    }
-
-    @Override
-    public AccessToken createLongLivedAccessToken() {
-        int lifetime = ConfigurationFactory.instance().getConfiguration().getLongLivedAccessTokenLifetime();
         String tokenType = ConfigurationFactory.instance().getConfiguration().getTokenType();
         
         final Map<String, String> claims = new HashMap<String, String>();
@@ -250,6 +240,18 @@ public abstract class AbstractAuthorizationGrant implements IAuthorizationGrant 
         accessToken.setAuthMode(getAcrValues());
 
         return accessToken;
+    
+    }
+
+    @Override
+    public AccessToken createLongLivedAccessToken() {
+        int lifetime = ConfigurationFactory.instance().getConfiguration().getLongLivedAccessTokenLifetime();
+        AccessToken accessToken = new AccessToken(lifetime);
+
+        accessToken.setAuthMode(getAcrValues());
+
+        return accessToken;
+    
     }
 
     @Override
