@@ -6,16 +6,22 @@
 
 package org.xdi.oxauth.model.common;
 
-import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
-import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
-import org.xdi.oxauth.model.token.HandleTokenFactory;
-import org.xdi.oxauth.model.util.JwtUtil;
-
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
+
+import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
+import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
+import org.xdi.oxauth.model.exception.InvalidJwtException;
+import org.xdi.oxauth.model.registration.Client;
+import org.xdi.oxauth.model.token.HandleTokenFactory;
+import org.xdi.oxauth.model.token.JwtHandleTokenFactory;
+import org.xdi.oxauth.model.util.JwtUtil;
+import org.xdi.util.security.StringEncrypter.EncryptionException;
 
 /**
  * <p>
@@ -45,6 +51,39 @@ public abstract class AbstractToken {
     @LdapAttribute(name = "oxAuthenticationMode")
     private String authMode;
 
+    public AbstractToken(int lifeTime, String tokenType, final Client client,
+			final AuthorizationGrantType authorizationGrantType,
+			final User user,
+			final String nonce,
+			final Date authenticationTime,
+			final AuthorizationCode authorizationCode, 
+			final Map<String, String> claims) {
+    	
+        Calendar calendar = Calendar.getInstance();
+        creationDate = calendar.getTime();
+        calendar.add(Calendar.SECOND, lifeTime);
+        expirationDate = calendar.getTime();
+
+        if (tokenType != null && "jwt".equals(tokenType)) {
+        	
+        	try {
+				code = JwtHandleTokenFactory.generateHandleToken(client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims);
+			} catch (SignatureException e) {
+				throw new RuntimeException("Token creation failed.", e);
+			} catch (InvalidJwtException e) {
+				throw new RuntimeException("Token creation failed.", e);
+			} catch (EncryptionException e) {
+				throw new RuntimeException("Token creation failed.", e);
+			}
+        } else {
+        	code = HandleTokenFactory.generateHandleToken();
+        }
+
+        revoked = false;
+        expired = false;
+    	
+    }
+    
     /**
      * Creates and initializes the values of an abstract token.
      *
