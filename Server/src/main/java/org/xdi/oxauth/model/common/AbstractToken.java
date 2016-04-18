@@ -19,6 +19,7 @@ import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
 import org.xdi.oxauth.model.exception.InvalidJwtException;
 import org.xdi.oxauth.model.registration.Client;
 import org.xdi.oxauth.model.token.HandleTokenFactory;
+import org.xdi.oxauth.model.token.JwtHandleTokenFactory;
 import org.xdi.oxauth.model.util.JwtUtil;
 import org.xdi.util.security.StringEncrypter.EncryptionException;
 
