@@ -90,7 +90,7 @@ public class IntrospectionWebService {
                                 response.setActive(tokenToIntrospect.isValid());
                                 response.setExpiresAt(tokenToIntrospect.getExpirationDate());
                                 response.setIssuedAt(tokenToIntrospect.getCreationDate());
-                                response.setAcrValues(tokenToIntrospect.getAuthMode());
+                                response.setAcrValues(grantOfIntrospectionToken.getAcrValues());
                                 
                                 if (tokenToIntrospect.isValid()) {
                                 	
