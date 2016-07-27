@@ -57,7 +57,8 @@ public abstract class AbstractToken {
 			final String nonce,
 			final Date authenticationTime,
 			final AuthorizationCode authorizationCode, 
-			final Map<String, String> claims) {
+			final Map<String, String> claims,
+			final String acrValues) {
     	
         Calendar calendar = Calendar.getInstance();
         creationDate = calendar.getTime();
@@ -67,7 +68,7 @@ public abstract class AbstractToken {
         if (tokenType != null && "jwt".equals(tokenType)) {
         	
         	try {
-				code = JwtHandleTokenFactory.generateHandleToken(client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims);
+				code = JwtHandleTokenFactory.generateHandleToken(client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims, acrValues);
 			} catch (SignatureException e) {
 				throw new RuntimeException("Token creation failed.", e);
 			} catch (InvalidJwtException e) {

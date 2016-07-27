@@ -65,8 +65,9 @@ public class AccessToken extends AbstractToken {
 			final String nonce,
 			final Date authenticationTime,
 			final AuthorizationCode authorizationCode, 
-			final Map<String, String> claims) {
-    	super(lifeTime, tokenType, client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims);
+			final Map<String, String> claims,
+			final String acrValues) {
+    	super(lifeTime, tokenType, client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims, acrValues);
     	this.tokenType = TokenType.BEARER;
     }
     

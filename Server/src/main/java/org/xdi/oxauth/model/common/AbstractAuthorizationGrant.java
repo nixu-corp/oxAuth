@@ -253,7 +253,7 @@ public abstract class AbstractAuthorizationGrant implements IAuthorizationGrant 
         	claims.put("scope", "");
         }
         
-        AccessToken accessToken = new AccessToken(lifetime, tokenType, client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims);
+        AccessToken accessToken = new AccessToken(lifetime, tokenType, client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims, getAcrValues());
 
         accessToken.setAuthMode(getAcrValues());
 

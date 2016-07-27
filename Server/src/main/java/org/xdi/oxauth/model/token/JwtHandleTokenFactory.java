@@ -37,7 +37,8 @@ public class JwtHandleTokenFactory {
 			final String nonce,
 			final Date authenticationTime,
 			final AuthorizationCode authorizationCode, 
-			final Map<String, String> claims) throws SignatureException, InvalidJwtException, StringEncrypter.EncryptionException {
+			final Map<String, String> claims,
+			final String acrValues) throws SignatureException, InvalidJwtException, StringEncrypter.EncryptionException {
 		
         Jwt jwt = new Jwt();
         JSONWebKeySet jwks = ConfigurationFactory.instance().getWebKeys();
@@ -88,6 +89,9 @@ public class JwtHandleTokenFactory {
         }
         if (authenticationTime != null) {
             jwt.getClaims().setClaim(JwtClaimName.AUTHENTICATION_TIME, authenticationTime);
+        }
+        if (StringUtils.isNotBlank(acrValues)) {
+        	jwt.getClaims().setClaim(JwtClaimName.AUTHENTICATION_CONTEXT_CLASS_REFERENCE, acrValues);
         }
         if (authorizationCode != null) {
             String codeHash = authorizationCode.getHash(signatureAlgorithm);
