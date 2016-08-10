@@ -12,7 +12,8 @@
                 <script type="text/javascript">
                         //<![CDATA[
                             var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                            if (iOS == false) {
+                            var bankid_login = #{strongauth_bankid_show_iframe};
+                            if (bankid_login == false || iOS == false) {
                             jQuery(document).ready(function() {
                                 setTimeout(function() {
                                         $("#loginForm").submit();
