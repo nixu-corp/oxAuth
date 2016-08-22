@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:s="http://jboss.com/products/seam/taglib">
+<f:view>
+    <head lang="en">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title><ui:insert name="pageTitle"/></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script><!--[if lt IE 9]>
+   	   <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+   	   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  	  <![endif]-->
+    
+<script>
+$(document).ready(function() {
+  $('#signer-e').fadeIn('slow');
+  $('#signer-m').hide();
+  $('#e-signed').hide();
+  $('#e-failed').hide();
+
+  markSigned = function() {
+    $('#signingControllers').hide();
+    $('#signer-e').hide();
+    $('#signer-m').hide();
+    $('#e-failed').hide();
+    $('#e-signed').fadeIn('slow');
+  };
+
+  markFailed = function() {
+    $('#signer-e').show();
+    $('#signer-m').hide();
+    $('#e-signed').hide();
+    $('#e-failed').fadeIn('slow');
+  };
+});
+
+</script>
+
+  <style type="text/css">
+
+* {
+  font-size: 16px;
+}
+
+    a,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: #69be28;
+    }
+
+    a:hover {
+      color: #000000;
+    }
+
+    h4 {
+      text-transform: uppercase
+    }
+
+    .animate-show {
+      line-height: 20px;
+      opacity: 1;
+      padding: 10px;
+    }
+
+    asiassa.animate-show.ng-hide-add.ng-hide-add-active,
+    .animate-show.ng-hide-remove.ng-hide-remove-active {
+      -webkit-transition: all linear 2.5s;
+      transition: all linear 2.5s;
+    }
+
+    .animate-show.ng-hide {
+      line-height: 0;
+      opacity: 0;
+      padding: 0 10px;
+    }
+
+    p {
+      margin: 20px 0;
+    }
+
+    ol li {
+      margin: 16px inherit;
+    }
+  </style>
+    <ui:insert name="head"/>
+    </head>
+    <body>
+  <br /><br />
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-xs-12 col-md-8" style="border: 20px solid #eee; border-bottom: none; height: 100px;">
+      <div style="width: 80%; height: 80px; background-image: url('#{oxAuthConfigurationService.getImgLocation()}/tilaajavastuu.png'); background-size: 40%; background-repeat: no-repeat; background-position: left center;">
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    </div> <!-- .row -->
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-xs-12 col-md-8" style="border: 20px solid #eee; border-top: none;">
+        <ui:insert name="body"/>
+      </div>
+    </div>
+    <p>
+    </p>
+    <hr />
+    <p class="small">
+      <h:outputText value="#{messages['tilaajavastuu_footer']}" escape="false" />
+    </p>
+  </div>
+  <div class="col-md-2"></div>
+    </body>
+</f:view>
+</html>

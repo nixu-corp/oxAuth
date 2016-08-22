@@ -65,7 +65,7 @@
                     <ul>
                     	<ui:repeat var="_scope" value="#{authorizeAction.scopes}">
                             <li>
-                                <h:outputText value="#{_scope.description}" />
+                                <h:outputText value="#{messages[_scope.description]}" />
                             </li>
                         </ui:repeat>
                     </ul>

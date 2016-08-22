@@ -7,6 +7,9 @@
 package org.xdi.oxauth.model.common;
 
 import java.util.Date;
+import java.util.Map;
+
+import org.xdi.oxauth.model.registration.Client;
 
 /**
  * <p>
@@ -56,6 +59,18 @@ public class AccessToken extends AbstractToken {
         this.tokenType = TokenType.BEARER;
     }
 
+    public AccessToken(int lifeTime, String tokenType, final Client client,
+			final AuthorizationGrantType authorizationGrantType,
+			final User user,
+			final String nonce,
+			final Date authenticationTime,
+			final AuthorizationCode authorizationCode, 
+			final Map<String, String> claims,
+			final String acrValues) {
+    	super(lifeTime, tokenType, client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims, acrValues);
+    	this.tokenType = TokenType.BEARER;
+    }
+    
     public AccessToken(String tokenCode, Date creationDate, Date expirationDate) {
         super(tokenCode, creationDate, expirationDate);
     }

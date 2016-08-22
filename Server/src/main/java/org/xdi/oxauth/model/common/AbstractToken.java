@@ -8,7 +8,9 @@ package org.xdi.oxauth.model.common;
 
 import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
 import org.xdi.oxauth.model.crypto.signature.SignatureAlgorithm;
+import org.xdi.oxauth.model.registration.Client;
 import org.xdi.oxauth.model.token.HandleTokenFactory;
+import org.xdi.oxauth.model.token.JwtHandleTokenFactory;
 import org.xdi.oxauth.model.util.JwtUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -16,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * <p>
@@ -47,6 +50,36 @@ public abstract class AbstractToken {
 
     private String sessionDn;
 
+    public AbstractToken(int lifeTime, String tokenType, final Client client,
+			final AuthorizationGrantType authorizationGrantType,
+			final User user,
+			final String nonce,
+			final Date authenticationTime,
+			final AuthorizationCode authorizationCode, 
+			final Map<String, String> claims,
+			final String acrValues) {
+    	
+        Calendar calendar = Calendar.getInstance();
+        creationDate = calendar.getTime();
+        calendar.add(Calendar.SECOND, lifeTime);
+        expirationDate = calendar.getTime();
+
+        if (tokenType != null && "jwt".equals(tokenType)) {
+        	
+        	try {
+				code = JwtHandleTokenFactory.generateHandleToken(client, authorizationGrantType, user, nonce, authenticationTime, authorizationCode, claims, acrValues);
+			} catch (Exception e) {
+				throw new RuntimeException("Token creation failed.", e);
+			}
+        } else {
+        	code = HandleTokenFactory.generateHandleToken();
+        }
+
+        revoked = false;
+        expired = false;
+    	
+    }
+    
     /**
      * Creates and initializes the values of an abstract token.
      *

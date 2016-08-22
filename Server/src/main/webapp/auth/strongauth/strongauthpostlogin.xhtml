@@ -1,0 +1,36 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="/WEB-INF/incl/layout/template_#{ui_template}.xhtml">
+
+    <ui:define name="pageTitle">#{messages[ui_header]}</ui:define>
+
+    <ui:define name="body">
+        <h:form id="loginForm">
+            <s:token />
+
+            <h:panelGroup rendered="#{not identity.loggedIn}">
+			<h3>#{messages['strongauth_confirmation_header']}</h3>
+			<hr/>
+			<p class="lead">
+			#{messages['confirmation_storage']}
+			<ul class="lead" style="list-style-type: square;">
+				<li>#{messages['confirmation_name']}: <b>#{strongauth_name}</b></li>
+				<li>#{messages['confirmation_personal_number']}: <b>#{strongauth_personal_number}</b></li>
+			</ul>
+			</p>
+			<p class="lead">
+				<h:outputText value="#{messages[theme_terms]}" escape="false" />
+			</p>
+			<p class="lead">
+                        <h:commandButton id="approveButton" class="btn btn-lg btn-default btn-success" value="#{messages['approve']}" action="#{authenticator.authenticate}" />
+			<h:commandLink value="#{messages['cancel']}" action="#{authenticator.authenticate}" />
+			</p>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,57 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:s="http://jboss.com/products/seam/taglib"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        template="/WEB-INF/incl/layout/template_#{ui_template}.xhtml">
+        <ui:define name="head">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                <script src="#{oxAuthConfigurationService.getJsLocation()}/jquery-1.11.3.min.js" />
+                <script type="text/javascript">
+                        //<![CDATA[
+                            var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                            var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+                            var bankid_login = #{strongauth_bankid_show_iframe};
+                            if (bankid_login == false || (iOS == false && android == false)) {
+                            jQuery(document).ready(function() {
+                                setTimeout(function() {
+                                        $("#loginForm").submit();
+                                }, 5000);
+                            });
+                            } else {
+                                setTimeout(function() {
+                                        if (!navigator.userAgent.match('CriOS')) {
+                                                document.location.href = "bankid:///?autostarttoken=#{strongauth_bankid_auto_start_token}&redirect=#{strongauth_forward_url}";
+                                        } else {
+                                                document.location.href = "bankid:///?autostarttoken=#{strongauth_bankid_auto_start_token}&redirect=null";
+                                        }
+                                }, 1000);
+                            }
+                        //]]>
+                </script>
+        </ui:define>
+
+        <ui:define name="pageTitle">#{messages[ui_header]}</ui:define>
+
+        <ui:define name="body">
+                <h:panelGroup rendered="#{not identity.loggedIn}">
+                <h3 style="margin: 20px 0;">#{messages['authenticating']}</h3>
+                <hr/>
+                <p class="lead">
+                <ui:fragment rendered="#{strongauth_mobiilid_challengeID != null}">
+                #{messages['mobiilid_sending_auth_request']}<br/>
+                #{messages['mobiilid_verification_code']}: #{strongauth_mobiilid_challengeID}<br/>
+                #{messages['mobiilid_check_verification_code']}<br/>
+                </ui:fragment>
+                <ui:fragment rendered="#{strongauth_bankid_show_iframe == 'true'}">
+                <iframe src='bankid:///?autostarttoken=#{strongauth_bankid_auto_start_token}&amp;redirect=null' height="0" width="0" style="display:none"></iframe>
+                <a href="#" onclick="$('#loginForm').submit();">Refresh</a>
+                </ui:fragment>
+                </p>
+                <form id="loginForm" method="get" action="#{strongauth_forward_url}">
+                </form>
+                </h:panelGroup>
+        </ui:define>
+</ui:composition>

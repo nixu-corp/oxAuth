@@ -1,0 +1,187 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/incl/layout/template_#{ui_template}.xhtml">
+	<ui:define name="head">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+		<style>
+			.login-button {
+				border: none;
+			}
+		</style>
+
+	</ui:define>
+	
+	<ui:define name="pageTitle">#{messages[ui_header]}</ui:define>
+
+	<ui:define name="body">
+		<h:panelGroup rendered="#{not identity.loggedIn}">
+		<h3>#{messages['strongauth_header1']}</h3>
+		<hr />
+			<h:messages id="messages" globalOnly="true" styleClass="list-group"
+                    errorClass="list-group-item list-group-item-danger" infoClass="list-group-item list-group-item-info" warnClass="list-group-item list-group-item-warning"
+                    rendered="#{showGlobalMessages != 'false'}"/>
+		<p class="lead">
+			#{messages['strongauth_header2']}
+		</p>
+		<h:panelGroup rendered="#{tupas_enabled}">
+		<div class="hidden-xs">
+                <c:forEach var="i" begin="1" end="#{(tupas_configs.size() / 3) +(1-((tupas_configs.size() / 3) %1))%1}">
+                    <div class="row">
+                        <c:forEach var="x" begin="${((i - 1) * 3)}" end="${(((i - 1) * 3) + 2)}">
+                            <c:if test="${(tupas_configs.size() - 1) ge x}">
+                                <div class="col-sm-4 text-center" style="vertical-align: bottom;">
+                        <form id="loginForm_#{x}" method="post" action="#{tupas_configs.get(x)['tupas_url']}">
+                                <input type="hidden" name="A01Y_ACTION_ID" value="#{tupas_configs.get(x)['tupas_action_id']}"/>
+                                <input type="hidden" name="A01Y_VERS" value="#{tupas_configs.get(x)['tupas_vers']}"/>
+                                <input type="hidden" name="A01Y_RCVID" value="#{tupas_configs.get(x)['tupas_rcvid']}"/>
+                                <input type="hidden" name="A01Y_LANGCODE" value="#{tupas_configs.get(x)['tupas_langcode']}"/>
+                                <input type="hidden" name="A01Y_STAMP" value="#{tupas_configs.get(x)['tupas_stamp']}"/>
+                                <input type="hidden" name="A01Y_IDTYPE" value="#{tupas_configs.get(x)['tupas_idtype']}"/>
+                                <input type="hidden" name="A01Y_RETLINK" value="#{tupas_configs.get(x)['tupas_retlink']}"/>
+                                <input type="hidden" name="A01Y_CANLINK" value="#{tupas_configs.get(x)['tupas_canlink']}"/>
+                                <input type="hidden" name="A01Y_REJLINK" value="#{tupas_configs.get(x)['tupas_rejlink']}"/>
+                                <input type="hidden" name="A01Y_KEYVERS" value="#{tupas_configs.get(x)['tupas_keyvers']}"/>
+                                <input type="hidden" name="A01Y_ALG" value="#{tupas_configs.get(x)['tupas_alg']}"/>
+                                <input type="hidden" name="A01Y_MAC" value="#{tupas_configs.get(x)['tupas_mac']}"/>
+				<a href="#" onclick="document.getElementById('loginForm_#{x}').submit(); return false;">
+					<div>
+						<img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/#{messages[tupas_configs.get(x)['tupas_logo']]}" />
+						<p>
+							#{messages[tupas_configs.get(x)['tupas_bankname']]}
+						</p>
+					</div>
+				</a>
+                        </form>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+		</div>
+                <div class="hidden-sm hidden-md hidden-lg">
+                <c:forEach var="i" begin="1" end="#{(tupas_configs.size() / 2) +(1-((tupas_configs.size() / 2) %1))%1}">
+                    <div class="row">
+                        <c:forEach var="x" begin="${((i - 1) * 2)}" end="${(((i - 1) * 2) + 1)}">
+                            <c:if test="${(tupas_configs.size() - 1) ge x}">
+                                <div class="col-xs-6 text-center" style="vertical-align: bottom;">
+                        <form id="loginForm_#{x}" method="post" action="#{tupas_configs.get(x)['tupas_url']}">
+                                <input type="hidden" name="A01Y_ACTION_ID" value="#{tupas_configs.get(x)['tupas_action_id']}"/>
+                                <input type="hidden" name="A01Y_VERS" value="#{tupas_configs.get(x)['tupas_vers']}"/>
+                                <input type="hidden" name="A01Y_RCVID" value="#{tupas_configs.get(x)['tupas_rcvid']}"/>
+                                <input type="hidden" name="A01Y_LANGCODE" value="#{tupas_configs.get(x)['tupas_langcode']}"/>
+                                <input type="hidden" name="A01Y_STAMP" value="#{tupas_configs.get(x)['tupas_stamp']}"/>
+                                <input type="hidden" name="A01Y_IDTYPE" value="#{tupas_configs.get(x)['tupas_idtype']}"/>
+                                <input type="hidden" name="A01Y_RETLINK" value="#{tupas_configs.get(x)['tupas_retlink']}"/>
+                                <input type="hidden" name="A01Y_CANLINK" value="#{tupas_configs.get(x)['tupas_canlink']}"/>
+                                <input type="hidden" name="A01Y_REJLINK" value="#{tupas_configs.get(x)['tupas_rejlink']}"/>
+                                <input type="hidden" name="A01Y_KEYVERS" value="#{tupas_configs.get(x)['tupas_keyvers']}"/>
+                                <input type="hidden" name="A01Y_ALG" value="#{tupas_configs.get(x)['tupas_alg']}"/>
+                                <input type="hidden" name="A01Y_MAC" value="#{tupas_configs.get(x)['tupas_mac']}"/>
+                                <a href="#" onclick="document.getElementById('loginForm_#{x}').submit(); return false;">
+                                        <div>
+                                                <img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/#{messages[tupas_configs.get(x)['tupas_logo']]}" />
+                                                <p>
+                                                        #{messages[tupas_configs.get(x)['tupas_bankname']]}
+                                                </p>
+                                        </div>
+                                </a>
+                        </form>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </c:forEach>
+                </div>
+		<hr/>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{digiid_enabled || mobiilid_enabled}">
+		<div class="row">
+			<h:panelGroup rendered="#{digiid_enabled}">
+			<div class="col-xs-6 col-sm-4 text-center">
+				<a href="#{digiid_forward_url}">
+					<div>
+						<img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/id-kaart-logo.png" />
+						<p>
+							#{messages['digiid']}
+						</p>
+					</div>
+				</a>
+			</div>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{mobiilid_enabled}">
+                        <div class="col-xs-6 col-sm-4 text-center">
+                                        <div>
+                                                <img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/mid-logo.png" />
+		<form id="loginForm_mobiilid" action="#{mobiilid_forward_url}">
+			<div class="form-group">
+			<label for="phone_no">#{messages['mobiilid_phone_number']}</label>
+			<input id="phone_no" class="form-control" type="text" name="phone_no" autocomplete="off" />
+			</div>
+			<div class="form-group">
+			<label for="personal_number">#{messages['mobiilid_personal_number']}</label>
+			<input id="personal_number" class="form-control" type="text" name="personal_number" autocomplete="off" />
+			<input type="hidden" name="mobiilid_op" value="true" />
+			</div>
+		</form>
+                                                <p>
+                                                        <a href="#" onclick="document.getElementById('loginForm_mobiilid').submit(); return false;">#{messages['mobiilid']}</a>
+                                                </p>
+                                        </div>
+                        </div>
+			</h:panelGroup>
+		</div>
+		<hr/>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{bankid_enabled}">
+		<div class="row">
+                        <div class="col-xs-6 col-sm-4 text-center">
+                                <a href="#{bankid_forward_url}">
+                                        <div>
+                                                <img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/bankid.jpg" />
+                                                <p>
+                                                        #{messages['bankid_same_device']}
+                                                </p>
+                                        </div>
+                                </a>
+                        </div>
+			<div class="col-xs-6 col-sm-4 text-center">
+				<div>
+					<img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/bankid.jpg" />
+                <form id="loginForm_bankid" action="#{mobiilid_forward_url}">
+                        <div class="form-group">
+                        <label for="personal_number">#{messages['bankid_personal_number']}</label>
+                        <input id="personal_number" class="form-control" type="text" name="personal_number" autocomplete="off" />
+                        </div>
+                        <input type="hidden" name="bankid_op" value="true" />
+                </form>
+                                                <p>
+                                                        <a href="#" onclick="document.getElementById('loginForm_bankid').submit(); return false;">#{messages['bankid_any_device']}</a>
+                                                </p>
+				</div>
+			</div>
+		</div>
+		<hr/>
+		</h:panelGroup>
+        <h:panelGroup rendered="#{ipasas_enabled}">
+		        <div class="row">
+                        <div class="col-xs-6 col-sm-4 text-center">
+                                <a href="#{ipasas_forward_url}">
+                                        <div>
+                                                <img style="margin: 10px;" src="#{oxAuthConfigurationService.getImgLocation()}/ipasas.png" />
+						<p>
+							#{messages['ipasas']}
+						</p>
+                                        </div>
+                                </a>
+                        </div>
+                </div>
+                </h:panelGroup>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>
