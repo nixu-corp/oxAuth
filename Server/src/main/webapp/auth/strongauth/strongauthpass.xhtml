@@ -5,7 +5,7 @@
         xmlns:s="http://jboss.com/products/seam/taglib"
         xmlns:ui="http://java.sun.com/jsf/facelets"
         xmlns:h="http://java.sun.com/jsf/html"
-        template="/WEB-INF/incl/layout/template_#{ui_template}.xhtml">
+        template="/WEB-INF/incl/layout/template#{ui_template == null ? '' : '_'.concat(ui_template)}.xhtml">
         <ui:define name="head">
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <script src="#{oxAuthConfigurationService.getJsLocation()}/jquery-1.11.3.min.js" />
@@ -13,8 +13,12 @@
                         //<![CDATA[
                             var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                             var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
-                            var bankid_login = #{strongauth_bankid_show_iframe};
-                            if (bankid_login == false || (iOS == false && android == false)) {
+                            var bankid_login = #{strongauth_bankid_show_iframe ? 'true' : 'false'};
+                            if (bankid_login == false) {
+                                jQuery(document).ready(function() {
+                                        $("#loginForm").submit();
+                                });
+                            } else if (bankid_login == true && iOS == false && android == false) {
                             jQuery(document).ready(function() {
                                 setTimeout(function() {
                                         $("#loginForm").submit();
@@ -30,6 +34,7 @@
                                 }, 1000);
                             }
                         //]]>
+
                 </script>
         </ui:define>
 

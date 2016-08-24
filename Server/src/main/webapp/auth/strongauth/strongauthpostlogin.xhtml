@@ -5,7 +5,7 @@
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
-                template="/WEB-INF/incl/layout/template_#{ui_template}.xhtml">
+                template="/WEB-INF/incl/layout/template#{ui_template == null ? '' : '_'.concat(ui_template)}.xhtml">
 
     <ui:define name="pageTitle">#{messages[ui_header]}</ui:define>
 
