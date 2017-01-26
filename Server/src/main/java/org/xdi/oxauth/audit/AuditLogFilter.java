@@ -40,8 +40,9 @@ public class AuditLogFilter extends AbstractFilter {
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
 
+		HttpSession session = null;
 		try {
-			HttpSession session = ((HttpServletRequest) req).getSession(false);
+			session = ((HttpServletRequest) req).getSession(false);
 			if (session != null) {
 				Object attribute = session
 						.getAttribute("org.jboss.seam.security.identity");
@@ -62,12 +63,21 @@ public class AuditLogFilter extends AbstractFilter {
 			MDC.put("method", ((HttpServletRequest) req).getMethod());
 			MDC.put("scheme", ((HttpServletRequest) req).getScheme());
 
-			chain.doFilter(req, resp);
+		} catch (Exception e) {
+			log.error("Request handling failed " + e.getMessage());
+		}
+			
+		chain.doFilter(req, resp);
+
+		try {
 
 			// if (req.getAttribute("sessionUser") != null) {
 			// MDC.put("sessionUser", req.getAttribute("sessionUser"));
 			// }
-			MDC.put("session_id", session.getId());
+			
+			if (session != null) {
+				MDC.put("session_id", session.getId());
+			}
 			if (req.getAttribute("client_id") != null) {
 				MDC.put("client_id", req.getAttribute("client_id"));
 			}
