@@ -2,6 +2,16 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
 
+	<appender name="AUDIT" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/audit.log"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="BufferSize" value="1000"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] Message\n -->
+            <param name="ConversionPattern" value="%d|%X{subject}|%X{ip}|%X{app}|%X{host}|%X{method}|%X{header.user-agent}|%X{status}|%X{scheme}|%X{session_id}|%X{client_id}|%X{header.x-forwarded-for}|%m %n"/>
+        </layout>		
+	</appender>
+
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
             <!-- The default pattern: Date Priority [Category] Message\n -->
@@ -171,6 +181,11 @@
         <level value="${log4j.default.log.level}"/>
         <appender-ref ref="OX_SCRIPT_LOG_FILE" />
     </logger>
+
+	<logger name="org.xdi.oxauth.audit" additivity="false">
+		<level value="INFO"/>
+		<appender-ref ref="AUDIT"/>
+	</logger>
 
     <root>
         <priority value="INFO"/>
