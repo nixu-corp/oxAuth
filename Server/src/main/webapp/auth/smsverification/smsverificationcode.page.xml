@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.org/schema/seam/pages"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://jboss.org/schema/seam/pages http://jboss.org/schema/seam/pages-2.3.xsd"
+          view-id="/auth/smsverification/smsverificationcode.xhtml">
+
+    <action execute="#{authenticator.prepareAuthenticationForStep}" on-postback="false" if="#{not identity.loggedIn}"/>
+
+    <rewrite pattern="/auth/smsverification/smsverification-code" />
+
+    <navigation from-action="#{authenticator.prepareAuthenticationForStep}">
+        <rule if-outcome="success">
+            <render view-id="/auth/smsverification/smsverificationcode.xhtml" />
+        </rule>
+
+        <rule if-outcome="no_permissions">
+            <end-conversation />
+            <redirect view-id="/error.xhtml">
+                <message severity="ERROR">You don't have permissions</message>
+            </redirect>
+        </rule>
+
+        <rule if-outcome="failure">
+            <end-conversation />
+            <redirect view-id="/auth/smsverification/smsverificationcode.xhtml">
+                <message severity="ERROR">SMS Code verification failed</message>
+            </redirect>
+        </rule>
+    </navigation>
+</page>

@@ -1,0 +1,48 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:s="http://jboss.com/products/seam/taglib"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+        template="/WEB-INF/incl/layout/template_tilaajavastuu.xhtml">
+        <ui:define name="head">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+
+        </ui:define>
+
+        <ui:define name="pageTitle">#{messages['smsverification.title']}</ui:define>
+        <ui:define name="documentTitle">#{messages['smsverification.containertitle']}</ui:define>
+
+        <ui:define name="body">
+
+
+      <h:form class="form-signin" id="codeForm">
+        <s:token/>
+
+        <h:panelGroup rendered="#{not identity.loggedIn}" layout="block">
+        
+        
+		<h:messages id="messages" globalOnly="true" styleClass="list-group"
+                    errorClass="list-group-item list-group-item-danger" infoClass="list-group-item list-group-item-info" warnClass="list-group-item list-group-item-warning"
+                    rendered="#{showGlobalMessages != 'false'}"/>
+        
+        <ui:param name="client"
+                value="#{clientService.getClient(sessionAttributes['client_id'])}"/>
+
+        <h:outputLabel for="smscode"  value="#{messages['smsverification.smscode']}"/>
+
+
+        <h:inputText id="smscode" class="form-control"
+                a:placeholder="Smscode" required="true" a:autofocus=""  autocomplete="off"/>
+                <h:commandButton class="btn btn-lg btn-primary btn-block" id="loginButton"
+                        value="#{messages['smsverification.smscodebutton']}"
+                        action="#{authenticator.authenticate}"/>
+                </h:panelGroup>
+      </h:form>
+
+
+        </ui:define>
+</ui:composition>
