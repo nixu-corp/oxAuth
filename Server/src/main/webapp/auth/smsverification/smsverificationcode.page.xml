@@ -22,9 +22,9 @@
 
         <rule if-outcome="failure">
             <end-conversation />
-            <redirect view-id="/auth/smsverification/smsverificationcode.xhtml">
-                <message severity="ERROR">SMS Code verification failed</message>
+            <redirect view-id="/auth/smsverification/smsverificationlogin.xhtml">
+                <message severity="ERROR">#{messages['smsverification.smscode.error']}</message>
             </redirect>
         </rule>
-    </navigation>
+    </navigation> 
 </page>

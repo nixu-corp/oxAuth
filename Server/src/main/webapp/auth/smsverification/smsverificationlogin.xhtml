@@ -22,10 +22,11 @@
         <s:token/>
 
         <h:panelGroup rendered="#{not identity.loggedIn}" layout="block">
-
-		<h:messages id="messages" globalOnly="true" styleClass="list-group"
-                    errorClass="list-group-item list-group-item-danger" infoClass="list-group-item list-group-item-info" warnClass="list-group-item list-group-item-warning"
-                    rendered="#{showGlobalMessages != 'false'}"/>
+        <ui:fragment rendered="#{faultstring != null}">
+        	<ul id="codeForm:messages" class="list-group">
+        		<li class="list-group-item list-group-item-danger">#{messages[faultstring]}</li>
+        	</ul>
+        </ui:fragment>
 
         <ui:param name="client"
                 value="#{clientService.getClient(sessionAttributes['client_id'])}"/>

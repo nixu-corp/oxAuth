@@ -5,7 +5,6 @@
           view-id="/auth/smsverification/smsverificationlogin.xhtml">
 
     <action execute="#{authenticator.prepareAuthenticationForStep}" on-postback="false" if="#{not identity.loggedIn}"/>
-
     <rewrite pattern="/auth/smsverification/smsverification-login" />
 
     <navigation from-action="#{authenticator.prepareAuthenticationForStep}">
