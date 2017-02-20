@@ -1,0 +1,27 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/incl/layout/template.xhtml">
+
+	<ui:define name="pageTitle">
+		<h:outputText value="#{messages['logout.pageTitle']}" />
+	</ui:define>
+
+	<ui:define name="body">
+
+		<ui:repeat var="frame" value="#{logoutUris}">
+			<iframe height="0" width="0" src="#{frame}"></iframe>
+		</ui:repeat>
+
+		<ui:fragment rendered="#{postlogoutUri != null}">
+			<script>
+               window.onload=function() {
+               	window.location='#{postlogoutUri}';
+               }
+             </script>
+		</ui:fragment>
+
+	</ui:define>
+</ui:composition>

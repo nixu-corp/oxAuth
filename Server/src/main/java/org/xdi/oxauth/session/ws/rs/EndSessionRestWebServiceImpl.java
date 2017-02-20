@@ -6,11 +6,20 @@
 
 package org.xdi.oxauth.session.ws.rs;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.faces.Renderer;
 import org.jboss.seam.log.Log;
 import org.jboss.seam.security.Identity;
 import org.xdi.oxauth.model.common.AuthorizationGrant;
@@ -33,12 +42,7 @@ import org.xdi.oxauth.util.ServerUtil;
 import org.xdi.util.Pair;
 import org.xdi.util.StringHelper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  * @author Javier Rojas Blum
@@ -231,39 +235,21 @@ public class EndSessionRestWebServiceImpl implements EndSessionRestWebService {
     }
 
     private String constructPage(Set<String> logoutUris, String postLogoutUrl, String state) {
-        String iframes = "";
-        for (String logoutUri : logoutUris) {
-            iframes = iframes + String.format("<iframe height=\"0\" width=\"0\" src=\"%s\"></iframe>", logoutUri);
-        }
-
-        String html = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>";
-
-        if (!Util.isNullOrEmpty(postLogoutUrl)) {
-
-            if (!Util.isNullOrEmpty(state)) {
+    	
+    	
+    	Contexts.getEventContext().set("logoutUris", logoutUris.toArray(new String[logoutUris.size()]));
+    	if (!Util.isNullOrEmpty(postLogoutUrl)) {
+    		if (!Util.isNullOrEmpty(state)) {
                 if (postLogoutUrl.contains("?")) {
                     postLogoutUrl += "&state=" + state;
                 } else {
                     postLogoutUrl += "?state=" + state;
                 }
             }
-
-            html += "<script>" +
-                    "window.onload=function() {" +
-                    "window.location='" + postLogoutUrl + "'" +
-                    "}" +
-                    "</script>";
-        }
-
-        html += "<title>Gluu Generated logout page</title>" +
-                "</head>" +
-                "<body>" +
-                "Logout requests sent.<br/>" +
-                iframes +
-                "</body>" +
-                "</html>";
-        return html;
+    		Contexts.getEventContext().set("postlogoutUri", postLogoutUrl);
+    	}
+    	
+    	return Renderer.instance().render("logout-frames.xhtml");
+    	
     }
 }
