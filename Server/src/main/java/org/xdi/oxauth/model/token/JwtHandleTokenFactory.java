@@ -53,7 +53,7 @@ public class JwtHandleTokenFactory {
         jwt.getClaims().setIssuer(ConfigurationFactory.instance().getConfiguration().getIssuer());
         jwt.getClaims().setAudience(client.getClientId());
 
-        int lifeTime = ConfigurationFactory.instance().getConfiguration().getIdTokenLifetime();
+        int lifeTime = ConfigurationFactory.instance().getConfiguration().getLongLivedAccessTokenLifetime();
         Calendar calendar = Calendar.getInstance();
         Date issuedAt = calendar.getTime();
         calendar.add(Calendar.SECOND, lifeTime);
